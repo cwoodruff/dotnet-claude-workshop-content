@@ -1,0 +1,24 @@
+# Sample `git log --oneline -20` — offline stand-in for the "query" half of Lab 3.
+# When the GitHub MCP server is unavailable, Claude can read this instead of querying the live repo
+# to answer "what's been happening, and what looks like a good first contribution?"
+
+b9f3837 Update .gitignore
+df8362a checkpoint C2 — steering kit + reviews endpoint (D1 Lab 2)
+20a2d30 Update .gitignore
+c012094 checkpoint C1 — complete CLAUDE.md (D1 Lab 1)
+1d9bd40 checkpoint C0
+3461331 Update .gitignore
+22a38bc docs done
+b865b3c Day 2 and Instructors content
+642ce45 updates and day 1 content
+4032778 Update .gitignore
+62eee6a Update .gitignore
+8449ceb Update .gitignore
+2910794 Update .gitignore
+42bedc1 Add RETYPE_KEY to retype-action workflow
+d373939 adding folders for workshop days
+e0d31a7 Create CNAME
+e52f39e Update retype.yml
+622bdfb Create retype-action.yml
+607f724 basic Retype docs for site
+ef12ded Initial commit

@@ -1,0 +1,5 @@
+{
+  "name": "booktracker-kit",
+  "version": "0.1.0",
+  "description": "BookTracker steering kit: API/data rules, the add-api-endpoint skill, and a destructive-command guardrail."
+}
