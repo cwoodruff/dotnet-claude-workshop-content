@@ -18,6 +18,7 @@ Everything is taught against **BookTracker**, a realistic ASP.NET Core Minimal A
 ```
 decks/   Slide decks for Day 1 and Day 2 (PowerPoint)
 src/     Eleven frozen checkpoints of the BookTracker app: c0 … c10
+docs/    Support reference pdf documents for the workshop
 ```
 
 ### Checkpoints: c0 through c10
@@ -47,7 +48,6 @@ Each directory under `src/` (`c0`–`c10`) is a **complete, independently builda
 - [.NET 10 SDK](https://dotnet.microsoft.com/download)
 - [Claude Code](https://claude.com/claude-code) (Day 1) and an Anthropic API key (Day 2)
 - [Docker](https://www.docker.com/) — for Qdrant (c7+) and Testcontainers-based tests (c9+)
-- [Ollama](https://ollama.com/) with `ollama pull nomic-embed-text` — local embeddings for RAG (c7+); optional, since the default vector store provider is `InMemory`
 
 ### Running a checkpoint
 
