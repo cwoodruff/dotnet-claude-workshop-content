@@ -1,126 +1,96 @@
-# BookTracker
+# BookTracker — Checkpoint c3 (MCP integration)
 
 The sample application for the **.NET AI with Claude Workshop**. An ASP.NET Core 10 Minimal API
-for tracking books, backed by EF Core 10 and SQLite. Every workshop lab evolves this same codebase.
+for tracking books, backed by EF Core 10 and SQLite.
 
-> **C0 — starter checkpoint.** This is the unmodified starting state. It is deliberately
-> *complete enough to feel real* and *flawed enough to teach* — see [Teaching gaps](#teaching-gaps).
+> **c3 — MCP integration.** *Day 1 · Section 3 — IDE Integration & MCP.* This is `c2` after
+> **Day 1, Lab 3**: the project now declares an **MCP server** in [`.mcp.json`](./.mcp.json), giving
+> Claude Code tools to read and write GitHub — and a `proposed-issues/` folder that captures the
+> lab's output (and an offline fallback for it).
 
-## Stack
+## What's new in this checkpoint
 
-- **.NET 10** · **ASP.NET Core Minimal API** (no controllers)
-- **EF Core 10** · **SQLite**
-- **xUnit** for tests
+- **`.mcp.json`** — project-scoped MCP configuration wiring the **GitHub MCP server** (HTTP transport)
+  into Claude Code:
 
-## Prerequisites
+  ```json
+  {
+    "mcpServers": {
+      "github": {
+        "type": "http",
+        "url": "https://api.githubcopilot.com/mcp/",
+        "headers": { "Authorization": "Bearer ${GITHUB_PAT}" }
+      }
+    }
+  }
+  ```
 
-- [.NET 10 SDK](https://dotnet.microsoft.com/download)
+  With this connected, Claude Code can browse repos, read issues, and (given a token with the right
+  scope) file issues — directly from your session. Set a `GITHUB_PAT` environment variable so the
+  `${GITHUB_PAT}` placeholder resolves.
+
+- **`proposed-issues/`** — the artifact of the lab:
+  - `reading-progress.md` — a fully-written GitHub issue body proposing the **Reading Progress**
+    feature. It doubles as an **offline fallback**: when the network is down and the GitHub MCP
+    server can't reach the API, writing the issue here *is* the "action" half of the lab. The feature
+    itself is implemented next, in `c4`.
+  - `recent-history.txt` — supporting context for the proposed issue.
+
+Application code is unchanged from `c2` — this checkpoint is about *connecting Claude Code to an
+external system*, not shipping a feature.
 
 ## Getting started
 
 ```bash
-cd src/BookTracker
+cd src/c3/BookTracker
 
-dotnet build BookTracker.sln       # build all four projects
-dotnet test BookTracker.sln        # run the test suite
-dotnet run --project BookTracker.Api
+dotnet build BookTracker.sln
+dotnet test BookTracker.sln
+dotnet run --project BookTracker.Api   # http://localhost:5255  (OpenAPI at /openapi)
 ```
 
-The database is created, migrated, and seeded automatically on first run — no manual setup needed.
-By default it lives in a local `booktracker.db` SQLite file (gitignored). The connection string is
-in `BookTracker.Api/appsettings.json` under `ConnectionStrings:BookTracker`.
+To use the GitHub MCP server from Claude Code, export a personal access token first:
+
+```bash
+export GITHUB_PAT="ghp_your_token_here"
+```
 
 ## Project layout
 
 ```text
 BookTracker.sln
-CLAUDE.md                     # minimal at start — you configure it in Day 1, Lab 1
-BookTracker.Core/             # domain entities, DTOs, interfaces, services  (depends on nothing)
-BookTracker.Data/             # EF Core DbContext, repository, migrations, seed  (depends on Core)
-BookTracker.Api/              # Minimal API endpoints + DI wiring  (depends on Core + Data)
-BookTracker.Tests/            # xUnit tests  (initially sparse)
-```
-
-Dependency direction: `Core` ← `Data` ← `Api`, all referenced by `Tests`. `Core` defines
-`IBookRepository` / `IAuthorRepository` *ports* implemented in `Data`, so the domain layer stays
-free of EF Core.
-
-## Data model
-
-A book belongs to exactly one author; an author can have many books (one-to-many). `Author` is its
-own table, and `Book` carries an `AuthorId` foreign key. Book responses embed the author:
-
-```json
-{ "id": 2, "title": "Clean Code", "author": { "id": 2, "name": "Robert C. Martin" }, "totalPages": 464 }
+CLAUDE.md
+.claude/                      # steering kit from c2
+.mcp.json                     # ← NEW: GitHub MCP server declaration
+proposed-issues/              # ← NEW: the lab's output (+ offline fallback)
+│   ├── reading-progress.md
+│   └── recent-history.txt
+BookTracker.Core/  BookTracker.Data/  BookTracker.Api/  BookTracker.Tests/
 ```
 
 ## API endpoints
 
-**Books** — under `/api/books`:
+Unchanged from `c2` — **Books**, **Authors**, and **Reviews**
+(`/api/books/{id}/reviews`). See [`c0`](../../c0/BookTracker/README.md#api-endpoints) and
+[`c2`](../../c2/BookTracker/README.md#api-endpoints) for the tables.
 
-| Method | Route                 | Description                                            |
-|--------|-----------------------|--------------------------------------------------------|
-| GET    | `/api/books`          | List all books (each with its author)                  |
-| GET    | `/api/books/{id}`     | Get a book by id (404 if missing)                      |
-| GET    | `/api/books/search?q=`| Search books by title                                  |
-| POST   | `/api/books`          | Create a book (201; 400 if `authorId` doesn't exist)   |
-| PUT    | `/api/books/{id}`     | Update a book (404 if missing; 400 if bad `authorId`)  |
-| DELETE | `/api/books/{id}`     | Delete a book (204, or 404)                            |
+## Try it
 
-**Authors** — under `/api/authors`:
-
-| Method | Route                 | Description                                            |
-|--------|-----------------------|--------------------------------------------------------|
-| GET    | `/api/authors`        | List all authors                                       |
-| GET    | `/api/authors/{id}`   | Get an author by id (404 if missing)                   |
-| POST   | `/api/authors`        | Create an author (returns 201)                         |
-| PUT    | `/api/authors/{id}`   | Update an author (404 if missing)                      |
-| DELETE | `/api/authors/{id}`   | Delete an author (204; 404 if missing; 409 if it has books) |
-
-A book references an author by `authorId`, which must already exist — create the author first.
-
-Example:
-
-```bash
-curl http://localhost:5255/api/books
-curl "http://localhost:5255/api/books/search?q=Clean"
-
-# Create an author, then a book that references it
-curl -X POST http://localhost:5255/api/authors \
-  -H "Content-Type: application/json" \
-  -d '{"name":"Martin Fowler"}'
-
-curl -X POST http://localhost:5255/api/books \
-  -H "Content-Type: application/json" \
-  -d '{"title":"Refactoring","authorId":6,"isbn":"9780134757599","totalPages":448,"genre":"Software"}'
-```
-
-## Database migrations
-
-Migrations live in `BookTracker.Data/Migrations` and are applied automatically at startup.
-To add one (requires the EF tools: `dotnet tool install --global dotnet-ef`):
-
-```bash
-dotnet ef migrations add <Name> \
-  --project BookTracker.Data \
-  --startup-project BookTracker.Api
-```
-
-## Conventions
-
-These are the rules the codebase expects (you formalize them in CLAUDE.md and path-scoped rules
-during Day 1):
-
-- DTOs (records) live in `BookTracker.Core/Dtos`. Endpoints **never** return EF entities.
-- Endpoints stay thin: parse → validate → call a service → map → typed `Results<...>`.
-- All data access is `async`/`await`. Thread the `CancellationToken` through.
-- Parameterized queries only — no string-concatenated SQL.
-- Every new endpoint group's `Map…Endpoints` method is wired in `Program.cs`.
-- Schema changes go through EF Core migrations in `BookTracker.Data`.
+With the GitHub MCP server connected, ask Claude Code to *"propose a Reading Progress feature as a
+GitHub issue"* and watch it use the MCP tools. Offline? It falls back to writing
+`proposed-issues/reading-progress.md`, which is exactly what you'll build in `c4`.
 
 ## Teaching gaps
 
-The starter ships with **intentional flaws** that attendees discover and fix across the Day 1 labs
-(validation holes, an SQL-injection vector, missing observability). Finding them is the exercise —
-they are not bugs to be reported, and the Reading Progress feature is intentionally absent because
-it's what you build in Day 1, Lab 4.
+The starter's intentional flaws still exist in the pre-existing endpoints. Reading Progress is still
+absent — it is the next checkpoint.
+
+## Workshop resources
+
+- **Guide:** [dotnetclaude.com](https://dotnetclaude.com) — Day 1, Section 3 (IDE Integration & MCP).
+- **Deck:** `decks/Day 1/Section3-IDE-Integration-MCP.pptx`
+- **Docs:** [MCP in Claude Code](https://docs.claude.com/en/docs/claude-code/mcp) ·
+  [Model Context Protocol](https://modelcontextprotocol.io) ·
+  [GitHub MCP server](https://github.com/github/github-mcp-server)
+- **Previous:** [`c2`](../../c2/BookTracker/README.md) — the `.claude/` steering kit.
+- **Next:** [`c4`](../../c4/BookTracker/README.md) — build Reading Progress from a written spec.

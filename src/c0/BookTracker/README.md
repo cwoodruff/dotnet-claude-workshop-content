@@ -1,10 +1,18 @@
-# BookTracker
+# BookTracker — Checkpoint c0 (Starter)
 
 The sample application for the **.NET AI with Claude Workshop**. An ASP.NET Core 10 Minimal API
 for tracking books, backed by EF Core 10 and SQLite. Every workshop lab evolves this same codebase.
 
-> **C0 — starter checkpoint.** This is the unmodified starting state. It is deliberately
-> *complete enough to feel real* and *flawed enough to teach* — see [Teaching gaps](#teaching-gaps).
+> **c0 — starter checkpoint.** *Day 1 · Section 1 — Foundations: the Claude Code CLI.*
+> This is the unmodified starting state — the app you meet before you've configured Claude Code for it.
+> It is deliberately *complete enough to feel real* and *flawed enough to teach* — see
+> [Teaching gaps](#teaching-gaps).
+
+## Where this fits
+
+`c0` is the baseline. Nothing in `.claude/`, no `CLAUDE.md` worth the name, no AI features — just a
+working Books + Authors API with intentional problems. Everything else in `src/` (`c1`–`c10`) is this
+same solution after another lab. If you ever want a clean slate, come back here.
 
 ## Stack
 
@@ -15,15 +23,16 @@ for tracking books, backed by EF Core 10 and SQLite. Every workshop lab evolves 
 ## Prerequisites
 
 - [.NET 10 SDK](https://dotnet.microsoft.com/download)
+- [Claude Code](https://claude.com/claude-code) — the tool you'll drive this codebase with all of Day 1
 
 ## Getting started
 
 ```bash
-cd src/BookTracker
+cd src/c0/BookTracker
 
 dotnet build BookTracker.sln       # build all four projects
 dotnet test BookTracker.sln        # run the test suite
-dotnet run --project BookTracker.Api
+dotnet run --project BookTracker.Api   # http://localhost:5255  (OpenAPI at /openapi)
 ```
 
 The database is created, migrated, and seeded automatically on first run — no manual setup needed.
@@ -34,7 +43,7 @@ in `BookTracker.Api/appsettings.json` under `ConnectionStrings:BookTracker`.
 
 ```text
 BookTracker.sln
-CLAUDE.md                     # minimal at start — you configure it in Day 1, Lab 1
+CLAUDE.md                     # minimal at start — you write a real one in Day 1, Lab 1 (c1)
 BookTracker.Core/             # domain entities, DTOs, interfaces, services  (depends on nothing)
 BookTracker.Data/             # EF Core DbContext, repository, migrations, seed  (depends on Core)
 BookTracker.Api/              # Minimal API endpoints + DI wiring  (depends on Core + Data)
@@ -108,7 +117,7 @@ dotnet ef migrations add <Name> \
 
 ## Conventions
 
-These are the rules the codebase expects (you formalize them in CLAUDE.md and path-scoped rules
+These are the rules the codebase expects (you formalize them in `CLAUDE.md` and path-scoped rules
 during Day 1):
 
 - DTOs (records) live in `BookTracker.Core/Dtos`. Endpoints **never** return EF entities.
@@ -121,6 +130,13 @@ during Day 1):
 ## Teaching gaps
 
 The starter ships with **intentional flaws** that attendees discover and fix across the Day 1 labs
-(validation holes, an SQL-injection vector, missing observability). Finding them is the exercise —
-they are not bugs to be reported, and the Reading Progress feature is intentionally absent because
-it's what you build in Day 1, Lab 4.
+(validation holes, an SQL-injection vector, endpoints returning EF entities, missing observability).
+Finding them is the exercise — they are **not bugs to be reported**, and the Reading Progress feature
+is intentionally absent because it's what you build in **Day 1, Lab 4** (`c4`).
+
+## Workshop resources
+
+- **Guide:** [dotnetclaude.com](https://dotnetclaude.com) — Day 1, Section 1 (Foundations).
+- **Deck:** `decks/Day 1/Section1-Foundations-Claude-Code-CLI.pptx`
+- **Claude Code docs:** <https://docs.claude.com/en/docs/claude-code>
+- **Next checkpoint:** [`c1`](../../c1/BookTracker/README.md) — give the app real project memory with a `CLAUDE.md`.

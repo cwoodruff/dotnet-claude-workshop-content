@@ -1,126 +1,85 @@
-# BookTracker
+# BookTracker — Checkpoint c1 (Project memory)
 
 The sample application for the **.NET AI with Claude Workshop**. An ASP.NET Core 10 Minimal API
-for tracking books, backed by EF Core 10 and SQLite. Every workshop lab evolves this same codebase.
+for tracking books, backed by EF Core 10 and SQLite.
 
-> **C0 — starter checkpoint.** This is the unmodified starting state. It is deliberately
-> *complete enough to feel real* and *flawed enough to teach* — see [Teaching gaps](#teaching-gaps).
+> **c1 — project memory.** *Day 1 · Section 1 — Foundations.* This is `c0` after **Day 1, Lab 1**:
+> the solution now carries a real [`CLAUDE.md`](./CLAUDE.md) so Claude Code understands the app's
+> stack, architecture, commands, and house rules on every turn — without you re-explaining them.
+
+## What's new in this checkpoint
+
+- **`CLAUDE.md`** at the solution root — the project-memory file Claude Code auto-loads into context.
+  It captures:
+  - the **stack** (.NET 10 Minimal API, EF Core 10 + SQLite, xUnit),
+  - the **build / test / run / migration commands**,
+  - the **four-project architecture** and its deliberate dependency direction, and
+  - the **conventions** (return DTOs never entities, validate at the endpoint, keep handlers thin,
+    parameterized queries only, async all the way, schema changes via migrations).
+
+Everything else is unchanged from `c0` — same Books + Authors API, same intentional
+[teaching gaps](#teaching-gaps).
+
+## Why it matters
+
+`CLAUDE.md` is the single highest-leverage steering file in Claude Code. Anything you'd otherwise
+repeat in every prompt — "we use Minimal APIs, not controllers," "never return EF entities" — belongs
+here once. Read it, then notice how much less you have to spell out for the rest of Day 1. In `c2`
+these conventions get *split out* into path-scoped rules under `.claude/rules/`.
 
 ## Stack
 
-- **.NET 10** · **ASP.NET Core Minimal API** (no controllers)
-- **EF Core 10** · **SQLite**
-- **xUnit** for tests
+- **.NET 10** · **ASP.NET Core Minimal API** · **EF Core 10 / SQLite** · **xUnit**
 
 ## Prerequisites
 
-- [.NET 10 SDK](https://dotnet.microsoft.com/download)
+- [.NET 10 SDK](https://dotnet.microsoft.com/download) · [Claude Code](https://claude.com/claude-code)
 
 ## Getting started
 
 ```bash
-cd src/BookTracker
+cd src/c1/BookTracker
 
-dotnet build BookTracker.sln       # build all four projects
-dotnet test BookTracker.sln        # run the test suite
-dotnet run --project BookTracker.Api
+dotnet build BookTracker.sln
+dotnet test BookTracker.sln
+dotnet run --project BookTracker.Api   # http://localhost:5255  (OpenAPI at /openapi)
 ```
 
-The database is created, migrated, and seeded automatically on first run — no manual setup needed.
-By default it lives in a local `booktracker.db` SQLite file (gitignored). The connection string is
-in `BookTracker.Api/appsettings.json` under `ConnectionStrings:BookTracker`.
+The SQLite database is created, migrated, and seeded automatically on first run.
 
 ## Project layout
 
 ```text
 BookTracker.sln
-CLAUDE.md                     # minimal at start — you configure it in Day 1, Lab 1
-BookTracker.Core/             # domain entities, DTOs, interfaces, services  (depends on nothing)
-BookTracker.Data/             # EF Core DbContext, repository, migrations, seed  (depends on Core)
-BookTracker.Api/              # Minimal API endpoints + DI wiring  (depends on Core + Data)
-BookTracker.Tests/            # xUnit tests  (initially sparse)
-```
-
-Dependency direction: `Core` ← `Data` ← `Api`, all referenced by `Tests`. `Core` defines
-`IBookRepository` / `IAuthorRepository` *ports* implemented in `Data`, so the domain layer stays
-free of EF Core.
-
-## Data model
-
-A book belongs to exactly one author; an author can have many books (one-to-many). `Author` is its
-own table, and `Book` carries an `AuthorId` foreign key. Book responses embed the author:
-
-```json
-{ "id": 2, "title": "Clean Code", "author": { "id": 2, "name": "Robert C. Martin" }, "totalPages": 464 }
+CLAUDE.md                     # ← NEW: project memory Claude Code loads every session
+BookTracker.Core/             # entities, DTOs, interfaces, services  (depends on nothing)
+BookTracker.Data/             # EF Core DbContext, repository, migrations, seed  (→ Core)
+BookTracker.Api/              # Minimal API endpoints + DI wiring  (→ Core + Data)
+BookTracker.Tests/            # xUnit tests
 ```
 
 ## API endpoints
 
-**Books** — under `/api/books`:
+Unchanged from `c0`: **Books** under `/api/books` (list, get, `search?q=`, create, update, delete)
+and **Authors** under `/api/authors` (list, get, create, update, delete). See
+[`c0`'s README](../../c0/BookTracker/README.md#api-endpoints) for the full table and examples.
 
-| Method | Route                 | Description                                            |
-|--------|-----------------------|--------------------------------------------------------|
-| GET    | `/api/books`          | List all books (each with its author)                  |
-| GET    | `/api/books/{id}`     | Get a book by id (404 if missing)                      |
-| GET    | `/api/books/search?q=`| Search books by title                                  |
-| POST   | `/api/books`          | Create a book (201; 400 if `authorId` doesn't exist)   |
-| PUT    | `/api/books/{id}`     | Update a book (404 if missing; 400 if bad `authorId`)  |
-| DELETE | `/api/books/{id}`     | Delete a book (204, or 404)                            |
+## Try it
 
-**Authors** — under `/api/authors`:
-
-| Method | Route                 | Description                                            |
-|--------|-----------------------|--------------------------------------------------------|
-| GET    | `/api/authors`        | List all authors                                       |
-| GET    | `/api/authors/{id}`   | Get an author by id (404 if missing)                   |
-| POST   | `/api/authors`        | Create an author (returns 201)                         |
-| PUT    | `/api/authors/{id}`   | Update an author (404 if missing)                      |
-| DELETE | `/api/authors/{id}`   | Delete an author (204; 404 if missing; 409 if it has books) |
-
-A book references an author by `authorId`, which must already exist — create the author first.
-
-Example:
-
-```bash
-curl http://localhost:5255/api/books
-curl "http://localhost:5255/api/books/search?q=Clean"
-
-# Create an author, then a book that references it
-curl -X POST http://localhost:5255/api/authors \
-  -H "Content-Type: application/json" \
-  -d '{"name":"Martin Fowler"}'
-
-curl -X POST http://localhost:5255/api/books \
-  -H "Content-Type: application/json" \
-  -d '{"title":"Refactoring","authorId":6,"isbn":"9780134757599","totalPages":448,"genre":"Software"}'
-```
-
-## Database migrations
-
-Migrations live in `BookTracker.Data/Migrations` and are applied automatically at startup.
-To add one (requires the EF tools: `dotnet tool install --global dotnet-ef`):
-
-```bash
-dotnet ef migrations add <Name> \
-  --project BookTracker.Data \
-  --startup-project BookTracker.Api
-```
-
-## Conventions
-
-These are the rules the codebase expects (you formalize them in CLAUDE.md and path-scoped rules
-during Day 1):
-
-- DTOs (records) live in `BookTracker.Core/Dtos`. Endpoints **never** return EF entities.
-- Endpoints stay thin: parse → validate → call a service → map → typed `Results<...>`.
-- All data access is `async`/`await`. Thread the `CancellationToken` through.
-- Parameterized queries only — no string-concatenated SQL.
-- Every new endpoint group's `Map…Endpoints` method is wired in `Program.cs`.
-- Schema changes go through EF Core migrations in `BookTracker.Data`.
+Ask Claude Code something whose answer should now come from `CLAUDE.md` — e.g.
+*"How do I add a migration in this repo?"* or *"What's our rule about returning EF entities?"* — and
+watch it answer from project memory instead of guessing.
 
 ## Teaching gaps
 
-The starter ships with **intentional flaws** that attendees discover and fix across the Day 1 labs
-(validation holes, an SQL-injection vector, missing observability). Finding them is the exercise —
-they are not bugs to be reported, and the Reading Progress feature is intentionally absent because
-it's what you build in Day 1, Lab 4.
+The intentional flaws from `c0` are still here (validation holes, an SQL-injection vector, endpoints
+returning EF entities). Fixing them is the work of later Day 1 labs — don't pre-emptively clean them
+up. The Reading Progress feature is still intentionally absent (it's built in `c4`).
+
+## Workshop resources
+
+- **Guide:** [dotnetclaude.com](https://dotnetclaude.com) — Day 1, Section 1 (Foundations).
+- **Deck:** `decks/Day 1/Section1-Foundations-Claude-Code-CLI.pptx`
+- **`CLAUDE.md` / memory docs:** <https://docs.claude.com/en/docs/claude-code/memory>
+- **Previous:** [`c0`](../../c0/BookTracker/README.md) — the raw starter.
+- **Next:** [`c2`](../../c2/BookTracker/README.md) — add `.claude/` steering (rules, agents, hooks, skills, a plugin) and the Reviews feature.

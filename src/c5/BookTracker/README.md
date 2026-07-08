@@ -1,126 +1,84 @@
-# BookTracker
+# BookTracker — Checkpoint c5 (Anthropic C# SDK)
 
 The sample application for the **.NET AI with Claude Workshop**. An ASP.NET Core 10 Minimal API
-for tracking books, backed by EF Core 10 and SQLite. Every workshop lab evolves this same codebase.
+for tracking books, backed by EF Core 10 and SQLite.
 
-> **C0 — starter checkpoint.** This is the unmodified starting state. It is deliberately
-> *complete enough to feel real* and *flawed enough to teach* — see [Teaching gaps](#teaching-gaps).
+> **c5 — Claude inside the app.** *Day 2 · Section 1 — C# SDK Fundamentals.* This is `c4` (the
+> finished Day 1 app) with its first **AI feature**: a `/api/chat` endpoint that calls Claude through
+> the official **Anthropic C# SDK**. Day 2 shifts from *using Claude to build* to *building with
+> Claude inside your own application*.
 
-## Stack
+## What's new in this checkpoint
 
-- **.NET 10** · **ASP.NET Core Minimal API** (no controllers)
-- **EF Core 10** · **SQLite**
-- **xUnit** for tests
+- **Anthropic SDK dependency** — `BookTracker.Api` now references the `Anthropic` NuGet package.
+- **`ClaudeService`** (`BookTracker.Api/Services/ClaudeService.cs`) implementing
+  **`IClaudeService`** (`BookTracker.Core`) — the wrapper that sends messages to Claude and returns
+  the reply. This is where model, system prompt, and max-tokens are configured.
+- **`AnthropicOptions`** (`BookTracker.Api/Options/`) — strongly-typed config bound from
+  `Anthropic:*` settings (API key, model).
+- **`ChatDtos`** (`BookTracker.Core/Dtos/`) — the request/response shapes for the chat endpoint.
+- **`ChatEndpoints`** — a `POST /api/chat` endpoint wired into the Minimal API.
 
 ## Prerequisites
 
 - [.NET 10 SDK](https://dotnet.microsoft.com/download)
+- An **Anthropic API key** — set it with user secrets (never commit it):
+
+  ```bash
+  cd src/c5/BookTracker
+  dotnet user-secrets set "Anthropic:ApiKey" "your-key-here" --project BookTracker.Api
+  ```
 
 ## Getting started
 
 ```bash
-cd src/BookTracker
+cd src/c5/BookTracker
 
-dotnet build BookTracker.sln       # build all four projects
-dotnet test BookTracker.sln        # run the test suite
-dotnet run --project BookTracker.Api
+dotnet build BookTracker.sln
+dotnet test BookTracker.sln
+dotnet run --project BookTracker.Api   # http://localhost:5255  (OpenAPI at /openapi)
 ```
-
-The database is created, migrated, and seeded automatically on first run — no manual setup needed.
-By default it lives in a local `booktracker.db` SQLite file (gitignored). The connection string is
-in `BookTracker.Api/appsettings.json` under `ConnectionStrings:BookTracker`.
 
 ## Project layout
 
 ```text
-BookTracker.sln
-CLAUDE.md                     # minimal at start — you configure it in Day 1, Lab 1
-BookTracker.Core/             # domain entities, DTOs, interfaces, services  (depends on nothing)
-BookTracker.Data/             # EF Core DbContext, repository, migrations, seed  (depends on Core)
-BookTracker.Api/              # Minimal API endpoints + DI wiring  (depends on Core + Data)
-BookTracker.Tests/            # xUnit tests  (initially sparse)
-```
-
-Dependency direction: `Core` ← `Data` ← `Api`, all referenced by `Tests`. `Core` defines
-`IBookRepository` / `IAuthorRepository` *ports* implemented in `Data`, so the domain layer stays
-free of EF Core.
-
-## Data model
-
-A book belongs to exactly one author; an author can have many books (one-to-many). `Author` is its
-own table, and `Book` carries an `AuthorId` foreign key. Book responses embed the author:
-
-```json
-{ "id": 2, "title": "Clean Code", "author": { "id": 2, "name": "Robert C. Martin" }, "totalPages": 464 }
+BookTracker.Core/
+└── Services/IClaudeService.cs          # ← NEW: the chat abstraction
+└── Dtos/ChatDtos.cs                    # ← NEW: chat request/response
+BookTracker.Api/
+├── Options/AnthropicOptions.cs         # ← NEW: bound Anthropic:* config
+├── Services/ClaudeService.cs           # ← NEW: SDK wrapper (model, system prompt, max tokens)
+└── Endpoints/ChatEndpoints.cs          # ← NEW: POST /api/chat
 ```
 
 ## API endpoints
 
-**Books** — under `/api/books`:
+All Day 1 endpoints (**Books**, **Authors**, **Reviews**, **Reading Progress**) still work. New:
 
-| Method | Route                 | Description                                            |
-|--------|-----------------------|--------------------------------------------------------|
-| GET    | `/api/books`          | List all books (each with its author)                  |
-| GET    | `/api/books/{id}`     | Get a book by id (404 if missing)                      |
-| GET    | `/api/books/search?q=`| Search books by title                                  |
-| POST   | `/api/books`          | Create a book (201; 400 if `authorId` doesn't exist)   |
-| PUT    | `/api/books/{id}`     | Update a book (404 if missing; 400 if bad `authorId`)  |
-| DELETE | `/api/books/{id}`     | Delete a book (204, or 404)                            |
+**Chat** — under `/api/chat`:
 
-**Authors** — under `/api/authors`:
+| Method | Route         | Description                                             |
+|--------|---------------|---------------------------------------------------------|
+| POST   | `/api/chat`   | Send a message to Claude, get a `ChatResponse` back     |
 
-| Method | Route                 | Description                                            |
-|--------|-----------------------|--------------------------------------------------------|
-| GET    | `/api/authors`        | List all authors                                       |
-| GET    | `/api/authors/{id}`   | Get an author by id (404 if missing)                   |
-| POST   | `/api/authors`        | Create an author (returns 201)                         |
-| PUT    | `/api/authors/{id}`   | Update an author (404 if missing)                      |
-| DELETE | `/api/authors/{id}`   | Delete an author (204; 404 if missing; 409 if it has books) |
-
-A book references an author by `authorId`, which must already exist — create the author first.
-
-Example:
+## Try it
 
 ```bash
-curl http://localhost:5255/api/books
-curl "http://localhost:5255/api/books/search?q=Clean"
-
-# Create an author, then a book that references it
-curl -X POST http://localhost:5255/api/authors \
+curl -X POST http://localhost:5255/api/chat \
   -H "Content-Type: application/json" \
-  -d '{"name":"Martin Fowler"}'
-
-curl -X POST http://localhost:5255/api/books \
-  -H "Content-Type: application/json" \
-  -d '{"title":"Refactoring","authorId":6,"isbn":"9780134757599","totalPages":448,"genre":"Software"}'
+  -d '{"message":"Recommend a book about software craftsmanship."}'
 ```
 
-## Database migrations
+If you get a 401/authentication error, your `Anthropic:ApiKey` user secret isn't set — see
+[Prerequisites](#prerequisites).
 
-Migrations live in `BookTracker.Data/Migrations` and are applied automatically at startup.
-To add one (requires the EF tools: `dotnet tool install --global dotnet-ef`):
+## Workshop resources
 
-```bash
-dotnet ef migrations add <Name> \
-  --project BookTracker.Data \
-  --startup-project BookTracker.Api
-```
-
-## Conventions
-
-These are the rules the codebase expects (you formalize them in CLAUDE.md and path-scoped rules
-during Day 1):
-
-- DTOs (records) live in `BookTracker.Core/Dtos`. Endpoints **never** return EF entities.
-- Endpoints stay thin: parse → validate → call a service → map → typed `Results<...>`.
-- All data access is `async`/`await`. Thread the `CancellationToken` through.
-- Parameterized queries only — no string-concatenated SQL.
-- Every new endpoint group's `Map…Endpoints` method is wired in `Program.cs`.
-- Schema changes go through EF Core migrations in `BookTracker.Data`.
-
-## Teaching gaps
-
-The starter ships with **intentional flaws** that attendees discover and fix across the Day 1 labs
-(validation holes, an SQL-injection vector, missing observability). Finding them is the exercise —
-they are not bugs to be reported, and the Reading Progress feature is intentionally absent because
-it's what you build in Day 1, Lab 4.
+- **Guide:** [dotnetclaude.com](https://dotnetclaude.com) — Day 2, Section 1 (C# SDK Fundamentals).
+- **Deck:** `decks/Day 2/Day2-Section1-CSharp-SDK-Fundamentals.pptx`
+- **Reference cards:** `docs/models-cost-reference-card.pdf` · `docs/day2-faq-reference-card.pdf`
+- **Docs:** [Anthropic API](https://docs.claude.com/en/api) ·
+  [Anthropic C# SDK](https://github.com/anthropics/anthropic-sdk-dotnet) ·
+  [Models overview](https://docs.claude.com/en/docs/about-claude/models)
+- **Previous:** [`c4`](../../c4/BookTracker/README.md) — the finished Day 1 app.
+- **Next:** [`c6`](../../c6/BookTracker/README.md) — streaming, tool use, and an agent loop.

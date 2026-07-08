@@ -1,126 +1,87 @@
-# BookTracker
+# BookTracker — Checkpoint c8 (An MCP server in C#)
 
 The sample application for the **.NET AI with Claude Workshop**. An ASP.NET Core 10 Minimal API
-for tracking books, backed by EF Core 10 and SQLite. Every workshop lab evolves this same codebase.
+for tracking books, backed by EF Core 10 and SQLite.
 
-> **C0 — starter checkpoint.** This is the unmodified starting state. It is deliberately
-> *complete enough to feel real* and *flawed enough to teach* — see [Teaching gaps](#teaching-gaps).
+> **c8 — your own MCP server.** *Day 2 · Section 4 — MCP Servers in C#.* This is `c7` plus a brand-new
+> **`BookTracker.Mcp`** project: a Model Context Protocol server, written in C#, that exposes
+> BookTracker's data as MCP tools any MCP client (Claude Code, Claude Desktop, …) can call. In `c3`
+> you *consumed* an MCP server; here you *build* one.
 
-## Stack
+## What's new in this checkpoint
 
-- **.NET 10** · **ASP.NET Core Minimal API** (no controllers)
-- **EF Core 10** · **SQLite**
-- **xUnit** for tests
+### `BookTracker.Mcp` project (new)
+
+An ASP.NET Core (`Microsoft.NET.Sdk.Web`) MCP server built on the `ModelContextProtocol` and
+`ModelContextProtocol.AspNetCore` packages, referencing `BookTracker.Core` and `BookTracker.Data` so
+it works against the real database.
+
+```text
+BookTracker.Mcp/
+├── Program.cs                          # host + MCP server wiring
+├── Tools/BookMcpTools.cs               # [McpServerTool] methods exposed to MCP clients
+├── Security/
+│   ├── McpAuth.cs                      # auth for the server
+│   └── AuditLogger.cs                  # logs tool invocations
+├── appsettings.json / .Development.json
+└── Properties/launchSettings.json
+```
+
+**Tools exposed** (`[McpServerTool]` methods in `BookMcpTools.cs`):
+
+- **Search books** — find books whose title matches a query (returns JSON).
+- **Get reading progress** — a book's page / status / percent complete by id.
+- **Add book** — create a new book (the author must already exist).
 
 ## Prerequisites
 
-- [.NET 10 SDK](https://dotnet.microsoft.com/download)
+- **Anthropic API key** for the API's AI features (as in earlier Day 2 checkpoints).
+- **Docker / Ollama** only if you exercise the `c7` RAG path.
 
 ## Getting started
 
 ```bash
-cd src/BookTracker
+cd src/c8/BookTracker
 
-dotnet build BookTracker.sln       # build all four projects
-dotnet test BookTracker.sln        # run the test suite
-dotnet run --project BookTracker.Api
+dotnet build BookTracker.sln
+dotnet test BookTracker.sln
+
+# run the API as before
+dotnet run --project BookTracker.Api      # http://localhost:5255
+
+# run the MCP server
+dotnet run --project BookTracker.Mcp
 ```
 
-The database is created, migrated, and seeded automatically on first run — no manual setup needed.
-By default it lives in a local `booktracker.db` SQLite file (gitignored). The connection string is
-in `BookTracker.Api/appsettings.json` under `ConnectionStrings:BookTracker`.
+Point an MCP client (e.g. Claude Code via `.mcp.json`, or Claude Desktop) at the running
+`BookTracker.Mcp` server to call its tools.
 
 ## Project layout
 
 ```text
 BookTracker.sln
-CLAUDE.md                     # minimal at start — you configure it in Day 1, Lab 1
-BookTracker.Core/             # domain entities, DTOs, interfaces, services  (depends on nothing)
-BookTracker.Data/             # EF Core DbContext, repository, migrations, seed  (depends on Core)
-BookTracker.Api/              # Minimal API endpoints + DI wiring  (depends on Core + Data)
-BookTracker.Tests/            # xUnit tests  (initially sparse)
-```
-
-Dependency direction: `Core` ← `Data` ← `Api`, all referenced by `Tests`. `Core` defines
-`IBookRepository` / `IAuthorRepository` *ports* implemented in `Data`, so the domain layer stays
-free of EF Core.
-
-## Data model
-
-A book belongs to exactly one author; an author can have many books (one-to-many). `Author` is its
-own table, and `Book` carries an `AuthorId` foreign key. Book responses embed the author:
-
-```json
-{ "id": 2, "title": "Clean Code", "author": { "id": 2, "name": "Robert C. Martin" }, "totalPages": 464 }
+BookTracker.Mcp/                        # ← NEW: the C# MCP server
+BookTracker.Core/  BookTracker.Data/  BookTracker.Api/  BookTracker.VectorStore/  BookTracker.Tests/
+docker-compose.yml
 ```
 
 ## API endpoints
 
-**Books** — under `/api/books`:
+The HTTP API is unchanged from `c7`. The new surface here is **MCP tools**, served by
+`BookTracker.Mcp` — not REST endpoints. Explore `Tools/BookMcpTools.cs` to see the tool contracts.
 
-| Method | Route                 | Description                                            |
-|--------|-----------------------|--------------------------------------------------------|
-| GET    | `/api/books`          | List all books (each with its author)                  |
-| GET    | `/api/books/{id}`     | Get a book by id (404 if missing)                      |
-| GET    | `/api/books/search?q=`| Search books by title                                  |
-| POST   | `/api/books`          | Create a book (201; 400 if `authorId` doesn't exist)   |
-| PUT    | `/api/books/{id}`     | Update a book (404 if missing; 400 if bad `authorId`)  |
-| DELETE | `/api/books/{id}`     | Delete a book (204, or 404)                            |
+## Try it
 
-**Authors** — under `/api/authors`:
+Run `BookTracker.Mcp`, connect Claude Code or Claude Desktop to it, and ask something like
+*"Search BookTracker for books about refactoring"* or *"What's my reading progress on book 1?"* —
+Claude will call your C# tools.
 
-| Method | Route                 | Description                                            |
-|--------|-----------------------|--------------------------------------------------------|
-| GET    | `/api/authors`        | List all authors                                       |
-| GET    | `/api/authors/{id}`   | Get an author by id (404 if missing)                   |
-| POST   | `/api/authors`        | Create an author (returns 201)                         |
-| PUT    | `/api/authors/{id}`   | Update an author (404 if missing)                      |
-| DELETE | `/api/authors/{id}`   | Delete an author (204; 404 if missing; 409 if it has books) |
+## Workshop resources
 
-A book references an author by `authorId`, which must already exist — create the author first.
-
-Example:
-
-```bash
-curl http://localhost:5255/api/books
-curl "http://localhost:5255/api/books/search?q=Clean"
-
-# Create an author, then a book that references it
-curl -X POST http://localhost:5255/api/authors \
-  -H "Content-Type: application/json" \
-  -d '{"name":"Martin Fowler"}'
-
-curl -X POST http://localhost:5255/api/books \
-  -H "Content-Type: application/json" \
-  -d '{"title":"Refactoring","authorId":6,"isbn":"9780134757599","totalPages":448,"genre":"Software"}'
-```
-
-## Database migrations
-
-Migrations live in `BookTracker.Data/Migrations` and are applied automatically at startup.
-To add one (requires the EF tools: `dotnet tool install --global dotnet-ef`):
-
-```bash
-dotnet ef migrations add <Name> \
-  --project BookTracker.Data \
-  --startup-project BookTracker.Api
-```
-
-## Conventions
-
-These are the rules the codebase expects (you formalize them in CLAUDE.md and path-scoped rules
-during Day 1):
-
-- DTOs (records) live in `BookTracker.Core/Dtos`. Endpoints **never** return EF entities.
-- Endpoints stay thin: parse → validate → call a service → map → typed `Results<...>`.
-- All data access is `async`/`await`. Thread the `CancellationToken` through.
-- Parameterized queries only — no string-concatenated SQL.
-- Every new endpoint group's `Map…Endpoints` method is wired in `Program.cs`.
-- Schema changes go through EF Core migrations in `BookTracker.Data`.
-
-## Teaching gaps
-
-The starter ships with **intentional flaws** that attendees discover and fix across the Day 1 labs
-(validation holes, an SQL-injection vector, missing observability). Finding them is the exercise —
-they are not bugs to be reported, and the Reading Progress feature is intentionally absent because
-it's what you build in Day 1, Lab 4.
+- **Guide:** [dotnetclaude.com](https://dotnetclaude.com) — Day 2, Section 4 (MCP Servers in C#).
+- **Deck:** `decks/Day 2/Day2-Section4-MCP-Servers-CSharp.pptx`
+- **Docs:** [Model Context Protocol](https://modelcontextprotocol.io) ·
+  [C# MCP SDK](https://github.com/modelcontextprotocol/csharp-sdk) ·
+  [MCP in Claude Code](https://docs.claude.com/en/docs/claude-code/mcp)
+- **Previous:** [`c7`](../../c7/BookTracker/README.md) — the RAG pipeline.
+- **Next:** [`c9`](../../c9/BookTracker/README.md) — testing AI systems.

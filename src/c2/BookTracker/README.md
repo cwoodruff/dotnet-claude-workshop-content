@@ -1,126 +1,115 @@
-# BookTracker
+# BookTracker — Checkpoint c2 (Steering with `.claude/`)
 
 The sample application for the **.NET AI with Claude Workshop**. An ASP.NET Core 10 Minimal API
-for tracking books, backed by EF Core 10 and SQLite. Every workshop lab evolves this same codebase.
+for tracking books, backed by EF Core 10 and SQLite.
 
-> **C0 — starter checkpoint.** This is the unmodified starting state. It is deliberately
-> *complete enough to feel real* and *flawed enough to teach* — see [Teaching gaps](#teaching-gaps).
+> **c2 — steering kit + Reviews feature.** *Day 1 · Section 2 — Steering Claude Code.* This is `c1`
+> after **Day 1, Lab 2**: a full `.claude/` directory now steers Claude Code with path-scoped rules,
+> a custom sub-agent, hooks, a skill, and a plugin — and the app gains its first *new* feature,
+> **book Reviews**, built with that steering in place.
 
-## Stack
+## What's new in this checkpoint
 
-- **.NET 10** · **ASP.NET Core Minimal API** (no controllers)
-- **EF Core 10** · **SQLite**
-- **xUnit** for tests
+### `.claude/` steering directory
 
-## Prerequisites
+```text
+.claude/
+├── settings.json                       # hooks wiring (see below)
+├── rules/
+│   ├── api-endpoints.md                # path-scoped rules for BookTracker.Api endpoints
+│   └── data-access.md                  # path-scoped rules for BookTracker.Data
+├── agents/
+│   └── test-writer.md                  # a custom sub-agent for writing xUnit tests
+├── hooks/
+│   └── block-destructive.sh            # PreToolUse guard against destructive Bash commands
+├── skills/
+│   └── add-api-endpoint/               # a reusable skill: route + handler + DTOs + test
+│       ├── SKILL.md
+│       └── references/endpoint-pattern.md
+└── plugins/
+    └── booktracker-kit/plugin.json     # bundles the rules, skill, and guardrail as one plugin
+```
 
-- [.NET 10 SDK](https://dotnet.microsoft.com/download)
+- **Rules** — conventions moved out of `CLAUDE.md` into `.claude/rules/`, loaded automatically only
+  when Claude works in the matching files (`api-endpoints.md`, `data-access.md`). `CLAUDE.md` now just
+  points at them.
+- **`settings.json` hooks** — a **PreToolUse** hook runs `block-destructive.sh` before any `Bash`
+  call, and a **PostToolUse** hook runs `dotnet build` after every `Edit`/`Write` so a broken change
+  surfaces immediately.
+- **`test-writer` agent** — a focused sub-agent you can dispatch to write tests in the house style.
+- **`add-api-endpoint` skill** — a repeatable procedure for adding an endpoint (DTOs → handler →
+  route wiring → test), with a reference pattern doc.
+- **`booktracker-kit` plugin** — packages the rules, the skill, and the destructive-command guardrail
+  so the whole steering kit can be shared as one unit.
+
+### Reviews feature (new)
+
+The first feature built *with* the steering kit — a one-to-many **Review** per book:
+
+- `Review` entity, `ReviewDto`, `IReviewRepository` + `ReviewRepository`, `IReviewService` +
+  `ReviewService`, and a `ReadingReviews` endpoint group.
+- EF Core migration `AddReviews`.
+- `ReviewServiceTests` in `BookTracker.Tests`.
 
 ## Getting started
 
 ```bash
-cd src/BookTracker
+cd src/c2/BookTracker
 
-dotnet build BookTracker.sln       # build all four projects
-dotnet test BookTracker.sln        # run the test suite
-dotnet run --project BookTracker.Api
+dotnet build BookTracker.sln
+dotnet test BookTracker.sln
+dotnet run --project BookTracker.Api   # http://localhost:5255  (OpenAPI at /openapi)
 ```
 
-The database is created, migrated, and seeded automatically on first run — no manual setup needed.
-By default it lives in a local `booktracker.db` SQLite file (gitignored). The connection string is
-in `BookTracker.Api/appsettings.json` under `ConnectionStrings:BookTracker`.
+The SQLite database is created, migrated (now including `AddReviews`), and seeded automatically.
 
 ## Project layout
 
 ```text
 BookTracker.sln
-CLAUDE.md                     # minimal at start — you configure it in Day 1, Lab 1
-BookTracker.Core/             # domain entities, DTOs, interfaces, services  (depends on nothing)
-BookTracker.Data/             # EF Core DbContext, repository, migrations, seed  (depends on Core)
-BookTracker.Api/              # Minimal API endpoints + DI wiring  (depends on Core + Data)
-BookTracker.Tests/            # xUnit tests  (initially sparse)
-```
-
-Dependency direction: `Core` ← `Data` ← `Api`, all referenced by `Tests`. `Core` defines
-`IBookRepository` / `IAuthorRepository` *ports* implemented in `Data`, so the domain layer stays
-free of EF Core.
-
-## Data model
-
-A book belongs to exactly one author; an author can have many books (one-to-many). `Author` is its
-own table, and `Book` carries an `AuthorId` foreign key. Book responses embed the author:
-
-```json
-{ "id": 2, "title": "Clean Code", "author": { "id": 2, "name": "Robert C. Martin" }, "totalPages": 464 }
+CLAUDE.md                     # now delegates conventions to .claude/rules/
+.claude/                      # ← NEW: rules, agent, hooks, skill, plugin
+BookTracker.Core/             # + Review entity, ReviewDto, IReviewRepository, IReviewService
+BookTracker.Data/             # + ReviewRepository, AddReviews migration
+BookTracker.Api/              # + Endpoints/ReviewsEndpoints.cs
+BookTracker.Tests/            # + ReviewServiceTests.cs
 ```
 
 ## API endpoints
 
-**Books** — under `/api/books`:
+Base **Books** and **Authors** endpoints are unchanged from
+[`c0`](../../c0/BookTracker/README.md#api-endpoints). New in `c2`:
 
-| Method | Route                 | Description                                            |
-|--------|-----------------------|--------------------------------------------------------|
-| GET    | `/api/books`          | List all books (each with its author)                  |
-| GET    | `/api/books/{id}`     | Get a book by id (404 if missing)                      |
-| GET    | `/api/books/search?q=`| Search books by title                                  |
-| POST   | `/api/books`          | Create a book (201; 400 if `authorId` doesn't exist)   |
-| PUT    | `/api/books/{id}`     | Update a book (404 if missing; 400 if bad `authorId`)  |
-| DELETE | `/api/books/{id}`     | Delete a book (204, or 404)                            |
+**Reviews** — nested under a book at `/api/books/{id:int}/reviews`:
 
-**Authors** — under `/api/authors`:
+| Method | Route                              | Description                                  |
+|--------|------------------------------------|----------------------------------------------|
+| GET    | `/api/books/{id}/reviews`          | List a book's reviews (404 if book missing)  |
 
-| Method | Route                 | Description                                            |
-|--------|-----------------------|--------------------------------------------------------|
-| GET    | `/api/authors`        | List all authors                                       |
-| GET    | `/api/authors/{id}`   | Get an author by id (404 if missing)                   |
-| POST   | `/api/authors`        | Create an author (returns 201)                         |
-| PUT    | `/api/authors/{id}`   | Update an author (404 if missing)                      |
-| DELETE | `/api/authors/{id}`   | Delete an author (204; 404 if missing; 409 if it has books) |
+(Plus the create/read handlers wired in `ReviewsEndpoints.cs` — explore the file to see the full set.)
 
-A book references an author by `authorId`, which must already exist — create the author first.
+## Try it
 
-Example:
+Trigger the steering you just added:
 
-```bash
-curl http://localhost:5255/api/books
-curl "http://localhost:5255/api/books/search?q=Clean"
-
-# Create an author, then a book that references it
-curl -X POST http://localhost:5255/api/authors \
-  -H "Content-Type: application/json" \
-  -d '{"name":"Martin Fowler"}'
-
-curl -X POST http://localhost:5255/api/books \
-  -H "Content-Type: application/json" \
-  -d '{"title":"Refactoring","authorId":6,"isbn":"9780134757599","totalPages":448,"genre":"Software"}'
-```
-
-## Database migrations
-
-Migrations live in `BookTracker.Data/Migrations` and are applied automatically at startup.
-To add one (requires the EF tools: `dotnet tool install --global dotnet-ef`):
-
-```bash
-dotnet ef migrations add <Name> \
-  --project BookTracker.Data \
-  --startup-project BookTracker.Api
-```
-
-## Conventions
-
-These are the rules the codebase expects (you formalize them in CLAUDE.md and path-scoped rules
-during Day 1):
-
-- DTOs (records) live in `BookTracker.Core/Dtos`. Endpoints **never** return EF entities.
-- Endpoints stay thin: parse → validate → call a service → map → typed `Results<...>`.
-- All data access is `async`/`await`. Thread the `CancellationToken` through.
-- Parameterized queries only — no string-concatenated SQL.
-- Every new endpoint group's `Map…Endpoints` method is wired in `Program.cs`.
-- Schema changes go through EF Core migrations in `BookTracker.Data`.
+- Ask Claude Code to *"add an endpoint"* and watch it invoke the **`add-api-endpoint`** skill.
+- Edit a file and watch the **PostToolUse** `dotnet build` hook run automatically.
+- Ask it to run a destructive `rm`-style command and watch the **PreToolUse** guard block it.
 
 ## Teaching gaps
 
-The starter ships with **intentional flaws** that attendees discover and fix across the Day 1 labs
-(validation holes, an SQL-injection vector, missing observability). Finding them is the exercise —
-they are not bugs to be reported, and the Reading Progress feature is intentionally absent because
-it's what you build in Day 1, Lab 4.
+Intentional flaws from the starter still remain in the pre-existing endpoints — they're fixed in later
+Day 1 work, not here. Reading Progress is still absent (built in `c4`).
+
+## Workshop resources
+
+- **Guide:** [dotnetclaude.com](https://dotnetclaude.com) — Day 1, Section 2 (Steering Claude Code).
+- **Deck:** `decks/Day 1/Section2-Steering-Claude-Code.pptx`
+- **Reference card:** `docs/steering-reference-card.pdf`
+- **Docs:** [Rules & settings](https://docs.claude.com/en/docs/claude-code/settings) ·
+  [Subagents](https://docs.claude.com/en/docs/claude-code/sub-agents) ·
+  [Hooks](https://docs.claude.com/en/docs/claude-code/hooks) ·
+  [Skills](https://docs.claude.com/en/docs/claude-code/skills) ·
+  [Plugins](https://docs.claude.com/en/docs/claude-code/plugins)
+- **Previous:** [`c1`](../../c1/BookTracker/README.md) — project memory via `CLAUDE.md`.
+- **Next:** [`c3`](../../c3/BookTracker/README.md) — connect the GitHub MCP server with `.mcp.json`.

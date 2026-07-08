@@ -1,126 +1,100 @@
-# BookTracker
+# BookTracker — Checkpoint c4 (Spec-driven feature)
 
 The sample application for the **.NET AI with Claude Workshop**. An ASP.NET Core 10 Minimal API
-for tracking books, backed by EF Core 10 and SQLite. Every workshop lab evolves this same codebase.
+for tracking books, backed by EF Core 10 and SQLite.
 
-> **C0 — starter checkpoint.** This is the unmodified starting state. It is deliberately
-> *complete enough to feel real* and *flawed enough to teach* — see [Teaching gaps](#teaching-gaps).
+> **c4 — Reading Progress, built from a spec.** *Day 1 · Section 4 — AI in the SDLC.* This is `c3`
+> after **Day 1, Lab 4**: the previously-absent **Reading Progress** feature is now implemented —
+> driven end-to-end by a written specification in [`specs/reading-progress.md`](./specs/reading-progress.md).
+> This is the capstone of Day 1: spec → code → tests, with Claude Code doing the build.
 
-## Stack
+## What's new in this checkpoint
 
-- **.NET 10** · **ASP.NET Core Minimal API** (no controllers)
-- **EF Core 10** · **SQLite**
-- **xUnit** for tests
+### `specs/reading-progress.md`
 
-## Prerequisites
+A complete, testable feature spec — the input to the lab. It defines the context/scope, the exact API
+contract, the data model, the **business rules** (a forward-only status state machine), the required
+tests, and explicit prohibitions. Read it alongside the code to see how a good spec constrains the
+implementation.
 
-- [.NET 10 SDK](https://dotnet.microsoft.com/download)
+### Reading Progress feature (new)
+
+One progress record per book — current page, status, and start/finish dates:
+
+- `ReadingProgress` + `ReadingStatus` entities, `ReadingProgressDto`.
+- `ReadingProgressRules` domain logic in `BookTracker.Core/Domain/` — the state machine and page
+  bounds live here, not in the handler.
+- `IReadingProgressRepository` / `ReadingProgressRepository`,
+  `IReadingProgressService` / `ReadingProgressService`.
+- `ReadingProgressEndpoints` (nested under a book).
+- EF Core migration `AddReadingProgress` (FK to Books, unique index on `BookId`).
+- `ReadingProgressTests` covering the rules from the spec.
+
+**Business rules (from the spec):**
+
+- Page bounds: `0 <= CurrentPage <= Book.TotalPages` (inclusive).
+- Status state machine (forward-only): `WantToRead → Reading → Completed`; same→same is a no-op;
+  skipping (`WantToRead → Completed`) is rejected; `Completed` is **terminal** (no going back).
+- Entering `Reading` sets `StartedOn` (today, if unset); entering `Completed` sets `FinishedOn` and
+  forces `CurrentPage = TotalPages`; `FinishedOn >= StartedOn`.
 
 ## Getting started
 
 ```bash
-cd src/BookTracker
+cd src/c4/BookTracker
 
-dotnet build BookTracker.sln       # build all four projects
-dotnet test BookTracker.sln        # run the test suite
-dotnet run --project BookTracker.Api
+dotnet build BookTracker.sln
+dotnet test BookTracker.sln
+dotnet run --project BookTracker.Api   # http://localhost:5255  (OpenAPI at /openapi)
 ```
-
-The database is created, migrated, and seeded automatically on first run — no manual setup needed.
-By default it lives in a local `booktracker.db` SQLite file (gitignored). The connection string is
-in `BookTracker.Api/appsettings.json` under `ConnectionStrings:BookTracker`.
 
 ## Project layout
 
 ```text
 BookTracker.sln
-CLAUDE.md                     # minimal at start — you configure it in Day 1, Lab 1
-BookTracker.Core/             # domain entities, DTOs, interfaces, services  (depends on nothing)
-BookTracker.Data/             # EF Core DbContext, repository, migrations, seed  (depends on Core)
-BookTracker.Api/              # Minimal API endpoints + DI wiring  (depends on Core + Data)
-BookTracker.Tests/            # xUnit tests  (initially sparse)
-```
-
-Dependency direction: `Core` ← `Data` ← `Api`, all referenced by `Tests`. `Core` defines
-`IBookRepository` / `IAuthorRepository` *ports* implemented in `Data`, so the domain layer stays
-free of EF Core.
-
-## Data model
-
-A book belongs to exactly one author; an author can have many books (one-to-many). `Author` is its
-own table, and `Book` carries an `AuthorId` foreign key. Book responses embed the author:
-
-```json
-{ "id": 2, "title": "Clean Code", "author": { "id": 2, "name": "Robert C. Martin" }, "totalPages": 464 }
+CLAUDE.md   .claude/   .mcp.json   proposed-issues/
+specs/
+└── reading-progress.md         # ← NEW: the feature spec that drove this checkpoint
+BookTracker.Core/               # + ReadingProgress/ReadingStatus, ReadingProgressRules, DTO, interfaces, service
+BookTracker.Data/               # + ReadingProgressRepository, AddReadingProgress migration
+BookTracker.Api/                # + Endpoints/ReadingProgressEndpoints.cs
+BookTracker.Tests/              # + ReadingProgressTests.cs
 ```
 
 ## API endpoints
 
-**Books** — under `/api/books`:
+Base **Books**, **Authors**, and **Reviews** are unchanged. New in `c4`:
 
-| Method | Route                 | Description                                            |
-|--------|-----------------------|--------------------------------------------------------|
-| GET    | `/api/books`          | List all books (each with its author)                  |
-| GET    | `/api/books/{id}`     | Get a book by id (404 if missing)                      |
-| GET    | `/api/books/search?q=`| Search books by title                                  |
-| POST   | `/api/books`          | Create a book (201; 400 if `authorId` doesn't exist)   |
-| PUT    | `/api/books/{id}`     | Update a book (404 if missing; 400 if bad `authorId`)  |
-| DELETE | `/api/books/{id}`     | Delete a book (204, or 404)                            |
+**Reading Progress** — nested under a book at `/api/books/{id:int}/reading-progress`:
 
-**Authors** — under `/api/authors`:
+| Method | Route                                    | Description                                                    |
+|--------|------------------------------------------|----------------------------------------------------------------|
+| GET    | `/api/books/{id}/reading-progress`       | Get the book's progress (`200` / `404` if no record or book)   |
+| PUT    | `/api/books/{id}/reading-progress`       | Set progress `{ currentPage, status }` (`200` / `400` rule violation / `404`) |
 
-| Method | Route                 | Description                                            |
-|--------|-----------------------|--------------------------------------------------------|
-| GET    | `/api/authors`        | List all authors                                       |
-| GET    | `/api/authors/{id}`   | Get an author by id (404 if missing)                   |
-| POST   | `/api/authors`        | Create an author (returns 201)                         |
-| PUT    | `/api/authors/{id}`   | Update an author (404 if missing)                      |
-| DELETE | `/api/authors/{id}`   | Delete an author (204; 404 if missing; 409 if it has books) |
-
-A book references an author by `authorId`, which must already exist — create the author first.
-
-Example:
+## Try it
 
 ```bash
-curl http://localhost:5255/api/books
-curl "http://localhost:5255/api/books/search?q=Clean"
+# Start reading a book, then mark it completed
+curl -X PUT http://localhost:5255/api/books/1/reading-progress \
+  -H "Content-Type: application/json" -d '{"currentPage":40,"status":"Reading"}'
 
-# Create an author, then a book that references it
-curl -X POST http://localhost:5255/api/authors \
-  -H "Content-Type: application/json" \
-  -d '{"name":"Martin Fowler"}'
-
-curl -X POST http://localhost:5255/api/books \
-  -H "Content-Type: application/json" \
-  -d '{"title":"Refactoring","authorId":6,"isbn":"9780134757599","totalPages":448,"genre":"Software"}'
+# Rule violation — skipping straight to Completed is rejected with 400
+curl -X PUT http://localhost:5255/api/books/2/reading-progress \
+  -H "Content-Type: application/json" -d '{"currentPage":0,"status":"Completed"}'
 ```
 
-## Database migrations
+## Day 1 complete
 
-Migrations live in `BookTracker.Data/Migrations` and are applied automatically at startup.
-To add one (requires the EF tools: `dotnet tool install --global dotnet-ef`):
+`c4` is the end of the Day 1 track: you've gone from a raw starter (`c0`) to a steered, MCP-connected
+project that ships features from specs. This same Reading Progress data is what Day 2's AI features
+(agent tools, MCP server) build on.
 
-```bash
-dotnet ef migrations add <Name> \
-  --project BookTracker.Data \
-  --startup-project BookTracker.Api
-```
+## Workshop resources
 
-## Conventions
-
-These are the rules the codebase expects (you formalize them in CLAUDE.md and path-scoped rules
-during Day 1):
-
-- DTOs (records) live in `BookTracker.Core/Dtos`. Endpoints **never** return EF entities.
-- Endpoints stay thin: parse → validate → call a service → map → typed `Results<...>`.
-- All data access is `async`/`await`. Thread the `CancellationToken` through.
-- Parameterized queries only — no string-concatenated SQL.
-- Every new endpoint group's `Map…Endpoints` method is wired in `Program.cs`.
-- Schema changes go through EF Core migrations in `BookTracker.Data`.
-
-## Teaching gaps
-
-The starter ships with **intentional flaws** that attendees discover and fix across the Day 1 labs
-(validation holes, an SQL-injection vector, missing observability). Finding them is the exercise —
-they are not bugs to be reported, and the Reading Progress feature is intentionally absent because
-it's what you build in Day 1, Lab 4.
+- **Guide:** [dotnetclaude.com](https://dotnetclaude.com) — Day 1, Section 4 (AI in the SDLC).
+- **Deck:** `decks/Day 1/Section4-AI-in-the-SDLC.pptx`
+- **Spec-driven development:** see [`specs/reading-progress.md`](./specs/reading-progress.md) and the
+  original proposal in [`proposed-issues/reading-progress.md`](./proposed-issues/reading-progress.md).
+- **Previous:** [`c3`](../../c3/BookTracker/README.md) — MCP integration.
+- **Next (Day 2):** [`c5`](../../c5/BookTracker/README.md) — call Claude from C# with the Anthropic SDK.

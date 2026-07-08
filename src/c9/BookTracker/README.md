@@ -1,126 +1,92 @@
-# BookTracker
+# BookTracker — Checkpoint c9 (Testing AI systems)
 
 The sample application for the **.NET AI with Claude Workshop**. An ASP.NET Core 10 Minimal API
-for tracking books, backed by EF Core 10 and SQLite. Every workshop lab evolves this same codebase.
+for tracking books, backed by EF Core 10 and SQLite.
 
-> **C0 — starter checkpoint.** This is the unmodified starting state. It is deliberately
-> *complete enough to feel real* and *flawed enough to teach* — see [Teaching gaps](#teaching-gaps).
+> **c9 — testing AI systems.** *Day 2 · Section 5 — AI Testing & CI/CD.* This is `c8` with the AI
+> features made **testable**: an LLM abstraction that can be substituted in tests, a test harness and
+> unit tests for the agent loop, and **Testcontainers**-based integration tests for the RAG and
+> SQL paths. Non-determinism is the challenge; this checkpoint shows how to test around it.
 
-## Stack
+## What's new in this checkpoint
 
-- **.NET 10** · **ASP.NET Core Minimal API** (no controllers)
-- **EF Core 10** · **SQLite**
-- **xUnit** for tests
+### An LLM seam for testing
+
+- **`IAgentLlm`** (`BookTracker.Core/Services/`) — an abstraction over the model call used by the
+  agent loop.
+- **`AnthropicAgentLlm`** (`BookTracker.Api/Services/`) — the real, SDK-backed implementation.
+
+Because the agent depends on `IAgentLlm`, tests can substitute a fake (via `NSubstitute`) and drive
+the loop deterministically — asserting *how tools are called* rather than gambling on model output.
+
+### Agent tests (`BookTracker.Tests/Agent/`)
+
+- **`AgentTestHarness.cs`** — scaffolding to script LLM responses and observe tool calls.
+- **`AgentServiceTests.cs`** — the happy paths of the tool-use loop.
+- **`AgentEdgeCaseTests.cs`** — malformed tool calls, loops, empty results, and other edge cases.
+
+### Integration tests (`BookTracker.Tests/Integration/`)
+
+- **`DockerFactAttribute.cs`** — a custom xUnit trait that skips Docker-dependent tests when Docker
+  isn't available, so the suite stays green locally and in CI.
+- **`QdrantRagTests.cs`** — spins up **Qdrant** with `Testcontainers.Qdrant` and exercises the real
+  RAG retrieval path from `c7`.
+- **`SqlServerTests.cs`** — spins up **SQL Server** with `Testcontainers.MsSql` to test against a real
+  relational engine, not just SQLite.
+
+New test dependencies: `NSubstitute`, `Testcontainers.Qdrant`, `Testcontainers.MsSql`,
+`Microsoft.AspNetCore.Mvc.Testing`, `Microsoft.EntityFrameworkCore.SqlServer`.
 
 ## Prerequisites
 
-- [.NET 10 SDK](https://dotnet.microsoft.com/download)
+- **.NET 10 SDK** · **Anthropic API key** (for running the app; agent unit tests don't need it).
+- **Docker** — required for the `[DockerFact]` integration tests (Qdrant / SQL Server containers).
+  Without Docker those tests are **skipped**, not failed.
 
 ## Getting started
 
 ```bash
-cd src/BookTracker
+cd src/c9/BookTracker
 
-dotnet build BookTracker.sln       # build all four projects
-dotnet test BookTracker.sln        # run the test suite
-dotnet run --project BookTracker.Api
+dotnet build BookTracker.sln
+dotnet test BookTracker.sln            # unit tests always run; container tests run if Docker is up
 ```
-
-The database is created, migrated, and seeded automatically on first run — no manual setup needed.
-By default it lives in a local `booktracker.db` SQLite file (gitignored). The connection string is
-in `BookTracker.Api/appsettings.json` under `ConnectionStrings:BookTracker`.
 
 ## Project layout
 
 ```text
-BookTracker.sln
-CLAUDE.md                     # minimal at start — you configure it in Day 1, Lab 1
-BookTracker.Core/             # domain entities, DTOs, interfaces, services  (depends on nothing)
-BookTracker.Data/             # EF Core DbContext, repository, migrations, seed  (depends on Core)
-BookTracker.Api/              # Minimal API endpoints + DI wiring  (depends on Core + Data)
-BookTracker.Tests/            # xUnit tests  (initially sparse)
-```
-
-Dependency direction: `Core` ← `Data` ← `Api`, all referenced by `Tests`. `Core` defines
-`IBookRepository` / `IAuthorRepository` *ports* implemented in `Data`, so the domain layer stays
-free of EF Core.
-
-## Data model
-
-A book belongs to exactly one author; an author can have many books (one-to-many). `Author` is its
-own table, and `Book` carries an `AuthorId` foreign key. Book responses embed the author:
-
-```json
-{ "id": 2, "title": "Clean Code", "author": { "id": 2, "name": "Robert C. Martin" }, "totalPages": 464 }
+BookTracker.Core/Services/IAgentLlm.cs          # ← NEW: the LLM seam
+BookTracker.Api/Services/AnthropicAgentLlm.cs   # ← NEW: real implementation
+BookTracker.Tests/
+├── Agent/
+│   ├── AgentTestHarness.cs                     # ← NEW
+│   ├── AgentServiceTests.cs                     # ← NEW
+│   └── AgentEdgeCaseTests.cs                    # ← NEW
+└── Integration/
+    ├── DockerFactAttribute.cs                   # ← NEW: skip-if-no-Docker trait
+    ├── QdrantRagTests.cs                         # ← NEW: Testcontainers Qdrant
+    └── SqlServerTests.cs                          # ← NEW: Testcontainers MsSql
 ```
 
 ## API endpoints
 
-**Books** — under `/api/books`:
+Unchanged from `c8` — this checkpoint adds *tests and a testable seam*, not new endpoints.
 
-| Method | Route                 | Description                                            |
-|--------|-----------------------|--------------------------------------------------------|
-| GET    | `/api/books`          | List all books (each with its author)                  |
-| GET    | `/api/books/{id}`     | Get a book by id (404 if missing)                      |
-| GET    | `/api/books/search?q=`| Search books by title                                  |
-| POST   | `/api/books`          | Create a book (201; 400 if `authorId` doesn't exist)   |
-| PUT    | `/api/books/{id}`     | Update a book (404 if missing; 400 if bad `authorId`)  |
-| DELETE | `/api/books/{id}`     | Delete a book (204, or 404)                            |
-
-**Authors** — under `/api/authors`:
-
-| Method | Route                 | Description                                            |
-|--------|-----------------------|--------------------------------------------------------|
-| GET    | `/api/authors`        | List all authors                                       |
-| GET    | `/api/authors/{id}`   | Get an author by id (404 if missing)                   |
-| POST   | `/api/authors`        | Create an author (returns 201)                         |
-| PUT    | `/api/authors/{id}`   | Update an author (404 if missing)                      |
-| DELETE | `/api/authors/{id}`   | Delete an author (204; 404 if missing; 409 if it has books) |
-
-A book references an author by `authorId`, which must already exist — create the author first.
-
-Example:
+## Try it
 
 ```bash
-curl http://localhost:5255/api/books
-curl "http://localhost:5255/api/books/search?q=Clean"
+# Run just the agent unit tests (no Docker needed)
+dotnet test --filter "FullyQualifiedName~Agent"
 
-# Create an author, then a book that references it
-curl -X POST http://localhost:5255/api/authors \
-  -H "Content-Type: application/json" \
-  -d '{"name":"Martin Fowler"}'
-
-curl -X POST http://localhost:5255/api/books \
-  -H "Content-Type: application/json" \
-  -d '{"title":"Refactoring","authorId":6,"isbn":"9780134757599","totalPages":448,"genre":"Software"}'
+# Run the container-backed integration tests (Docker must be running)
+dotnet test --filter "FullyQualifiedName~Integration"
 ```
 
-## Database migrations
+## Workshop resources
 
-Migrations live in `BookTracker.Data/Migrations` and are applied automatically at startup.
-To add one (requires the EF tools: `dotnet tool install --global dotnet-ef`):
-
-```bash
-dotnet ef migrations add <Name> \
-  --project BookTracker.Data \
-  --startup-project BookTracker.Api
-```
-
-## Conventions
-
-These are the rules the codebase expects (you formalize them in CLAUDE.md and path-scoped rules
-during Day 1):
-
-- DTOs (records) live in `BookTracker.Core/Dtos`. Endpoints **never** return EF entities.
-- Endpoints stay thin: parse → validate → call a service → map → typed `Results<...>`.
-- All data access is `async`/`await`. Thread the `CancellationToken` through.
-- Parameterized queries only — no string-concatenated SQL.
-- Every new endpoint group's `Map…Endpoints` method is wired in `Program.cs`.
-- Schema changes go through EF Core migrations in `BookTracker.Data`.
-
-## Teaching gaps
-
-The starter ships with **intentional flaws** that attendees discover and fix across the Day 1 labs
-(validation holes, an SQL-injection vector, missing observability). Finding them is the exercise —
-they are not bugs to be reported, and the Reading Progress feature is intentionally absent because
-it's what you build in Day 1, Lab 4.
+- **Guide:** [dotnetclaude.com](https://dotnetclaude.com) — Day 2, Section 5 (AI Testing & CI/CD).
+- **Deck:** `decks/Day 2/Day2-Section5-AI-Testing-CICD.pptx`
+- **Docs:** [Testcontainers for .NET](https://dotnet.testcontainers.org/) ·
+  [xUnit](https://xunit.net/) · [NSubstitute](https://nsubstitute.github.io/)
+- **Previous:** [`c8`](../../c8/BookTracker/README.md) — the C# MCP server.
+- **Next:** [`c10`](../../c10/BookTracker/README.md) — responsible AI: safety, auditing, token budgets.
