@@ -27,17 +27,17 @@ Each directory under `src/` (`c0`–`c10`) is a **complete, independently builda
 
 | Checkpoint | Day | What it adds |
 |---|---|---|
-| `c0` | 1 | Starter app: Books + Authors API — with intentional teaching gaps you'll discover in the labs |
-| `c1` | 1 | Project memory: a `CLAUDE.md` for the app |
-| `c2` | 1 | `.claude/` customization (rules, agents, hooks, skills, plugin) + Reviews feature |
-| `c3` | 1 | MCP integration (`.mcp.json` with GitHub MCP) + proposed issues |
-| `c4` | 1 | Reading Progress feature built from a written spec (`specs/reading-progress.md`) |
-| `c5` | 2 | Anthropic C# SDK, `/api/chat` endpoint, `ClaudeService` |
-| `c6` | 2 | Streaming responses, tool use, and an agent loop (`AgentService`) |
-| `c7` | 2 | RAG: vector store project, `/api/recommend`, Qdrant via Docker Compose |
-| `c8` | 2 | `BookTracker.Mcp` — an MCP server written in C# |
-| `c9` | 2 | Testing AI systems: LLM abstraction, agent tests, integration tests with Testcontainers |
-| `c10` | 2 | Responsible AI: prompt-injection defenses, AI audit logging, token-budget middleware, security tests |
+| [`c0`](src/c0/BookTracker/README.md) | 1 | Starter app: Books + Authors API — with intentional teaching gaps you'll discover in the labs |
+| [`c1`](src/c1/BookTracker/README.md) | 1 | Project memory: a `CLAUDE.md` for the app |
+| [`c2`](src/c2/BookTracker/README.md) | 1 | `.claude/` customization (rules, agents, hooks, skills, plugin) + Reviews feature |
+| [`c3`](src/c3/BookTracker/README.md) | 1 | MCP integration (`.mcp.json` with GitHub MCP) + proposed issues |
+| [`c4`](src/c4/BookTracker/README.md) | 1 | Reading Progress feature built from a written spec (`specs/reading-progress.md`) |
+| [`c5`](src/c5/BookTracker/README.md) | 2 | Anthropic C# SDK, `/api/chat` endpoint, `ClaudeService` |
+| [`c6`](src/c6/BookTracker/README.md) | 2 | Streaming responses, tool use, and an agent loop (`AgentService`) |
+| [`c7`](src/c7/BookTracker/README.md) | 2 | RAG: vector store project, `/api/recommend`, Qdrant via Docker Compose |
+| [`c8`](src/c8/BookTracker/README.md) | 2 | `BookTracker.Mcp` — an MCP server written in C# |
+| [`c9`](src/c9/BookTracker/README.md) | 2 | Testing AI systems: LLM abstraction, agent tests, integration tests with Testcontainers |
+| [`c10`](src/c10/BookTracker/README.md) | 2 | Responsible AI: prompt-injection defenses, AI audit logging, token-budget middleware, security tests |
 
 ⚠️ **Heads up:** the early checkpoints (`c0`–`c3`) contain *deliberate* problems — validation holes, a SQL-injection vector, endpoints returning EF entities. Finding and fixing them is part of the labs, so resist the urge to "clean them up" before the workshop. The fully hardened app is `c10`.
 
