@@ -1,0 +1,67 @@
+name: AI code review
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out PR
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Claude Code
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: Build the diff
+        run: git diff origin/${{ github.base_ref }}...HEAD > pr.diff
+
+      - name: Run Claude code review
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          PROMPT: |
+            You are reviewing a pull request diff for the BookTracker ASP.NET Core 10
+            Minimal API. The diff is provided on stdin in unified `git diff` format.
+
+            Review only the changed lines and their immediate context. Produce concise,
+            actionable Markdown grouped by severity. If there are no issues, say so plainly.
+
+            Focus your review on:
+            - Correctness: logic errors, off-by-one/null handling, incorrect status codes,
+              broken control flow, and behavior that contradicts the endpoint's intent.
+            - Security: SQL/command injection, string concatenation or interpolation flowing
+              into SQL or process/file paths, missing authentication/authorization on
+              endpoints or groups, missing input validation on request values (route, query,
+              header, body), and any leaked secrets, connection strings, or credentials in
+              code, config, or logs.
+            - Missing error handling: unguarded external calls, swallowed exceptions,
+              missing cancellation-token propagation, and absent not-found/bad-request paths.
+            - CLAUDE.md and .claude/rules/ violations specific to this repo:
+              - Endpoints must return DTOs/records, never EF Core entities.
+              - Endpoints must be thin and async — no blocking (.Result/.Wait()), business
+                logic behind Core service/repository interfaces.
+              - Database access must use parameterized EF Core queries only
+                (no raw string concatenation into SQL).
+              - EF Core migrations, DbContext, and data access live in BookTracker.Data;
+                Core references no other project (Api -> Data -> Core).
+
+            For each finding, cite the file and, where possible, the relevant hunk, explain
+            the risk, and suggest a concrete fix.
+        run: claude -p "$PROMPT" --model claude-haiku-4-5 < pr.diff > review.md
+
+      - name: Post review comment
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh pr comment ${{ github.event.pull_request.number }} --body-file review.md

@@ -1,0 +1,76 @@
+name: AI release notes
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release-notes:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Claude Code
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: Collect commits since previous tag
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          PREV=$(git describe --tags --abbrev=0 --match 'v*' "${TAG}^" 2>/dev/null || true)
+          if [ -n "$PREV" ]; then
+            RANGE="${PREV}..${TAG}"
+          else
+            RANGE="${TAG}"
+          fi
+          echo "Collecting commits for range: $RANGE"
+          git log "$RANGE" --no-merges --pretty=format:'- %s (%h)' > commits.txt
+          cat commits.txt
+
+      - name: Summarize release notes
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          PROMPT: |
+            You are writing release notes for the BookTracker ASP.NET Core 10 Minimal API.
+            The commit log for this release is provided on stdin, one commit per line.
+
+            Produce concise, user-facing release notes in Markdown, grouped under exactly
+            these headings (omit a heading only if it has no relevant entries):
+
+            ## What's New
+            ## Bug Fixes
+            ## Breaking Changes
+            ## Developer Notes
+
+            Guidelines:
+            - Rewrite commit subjects into clear, human-readable bullet points; do not just
+              echo raw commit messages.
+            - Classify by Conventional Commit intent: feat -> What's New, fix -> Bug Fixes,
+              anything noting a breaking change (feat!/fix!/BREAKING CHANGE) -> Breaking
+              Changes, and refactor/test/chore/docs/build/ci -> Developer Notes.
+            - Group related commits and drop noise (merge commits, trivial formatting).
+            - Keep it crisp and factual. Output only the Markdown notes, no preamble.
+        run: claude -p "$PROMPT" --model claude-haiku-4-5 < commits.txt > notes.md
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release edit "$TAG" --notes-file notes.md
+          else
+            gh release create "$TAG" --title "$TAG" --notes-file notes.md
+          fi
