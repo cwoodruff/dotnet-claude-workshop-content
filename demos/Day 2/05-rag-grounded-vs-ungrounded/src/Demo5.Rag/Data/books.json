@@ -1,0 +1,128 @@
+[
+  {
+    "id": 1,
+    "title": "The Pragmatic Programmer",
+    "author": "David Thomas & Andrew Hunt",
+    "genre": "Software",
+    "description": "A hands-on guide to the craft of software development. Through dozens of practical tips, it covers writing flexible and maintainable code, avoiding duplication with the DRY principle, using tracer bullets and prototypes, automating with the right tools, and taking pragmatic responsibility for your work. A career-spanning classic for developers who want to think about programming as a craft."
+  },
+  {
+    "id": 2,
+    "title": "Clean Code",
+    "author": "Robert C. Martin",
+    "genre": "Software",
+    "description": "A manual of software craftsmanship focused on writing code that humans can read. It argues that clean code is a matter of discipline: meaningful names, small functions that do one thing, clear comments only when needed, and rigorous handling of errors and boundaries. Includes detailed case studies that refactor messy code into clean code step by step."
+  },
+  {
+    "id": 3,
+    "title": "Domain-Driven Design",
+    "author": "Eric Evans",
+    "genre": "Software",
+    "description": "The foundational text on tackling complexity in software by modeling the business domain. It introduces a shared ubiquitous language between developers and domain experts, and building blocks such as entities, value objects, aggregates, repositories, and bounded contexts. A deep, strategic look at designing software that reflects how a business actually works."
+  },
+  {
+    "id": 4,
+    "title": "Dune",
+    "author": "Frank Herbert",
+    "genre": "Science Fiction",
+    "description": "Set on the desert planet Arrakis, the only source of the spice melange, this epic follows young Paul Atreides as his family is betrayed and he is drawn into a struggle for control of the planet and its people. A sweeping story of politics, religion, ecology, and prophecy that became one of the most influential science fiction novels ever written."
+  },
+  {
+    "id": 5,
+    "title": "The Name of the Wind",
+    "author": "Patrick Rothfuss",
+    "genre": "Fantasy",
+    "description": "The first day in the recounted life of Kvothe: a gifted young man who grows up among traveling performers, survives tragedy and poverty, and talks his way into a legendary university of magic. Framed as a memoir told over three days, it is a lyrical coming-of-age fantasy about music, magic, love, and the gap between a legend and the truth behind it."
+  },
+  {
+    "id": 6,
+    "title": "Refactoring",
+    "author": "Martin Fowler",
+    "genre": "Software",
+    "description": "The definitive catalog of techniques for improving the design of existing code without changing its behavior. Each refactoring is named, motivated, and walked through step by step, from Extract Function to Replace Conditional with Polymorphism. It teaches you to recognize code smells and to make large design changes as a sequence of small, safe transformations backed by tests."
+  },
+  {
+    "id": 7,
+    "title": "Designing Data-Intensive Applications",
+    "author": "Martin Kleppmann",
+    "genre": "Software",
+    "description": "A guided tour of the ideas behind reliable, scalable, and maintainable data systems. It explains storage engines, replication, partitioning, transactions, consensus, and stream processing, comparing the trade-offs real databases and queues make. Ideal for engineers who want to understand what happens under the hood of the systems they glue together."
+  },
+  {
+    "id": 8,
+    "title": "The Mythical Man-Month",
+    "author": "Frederick P. Brooks Jr.",
+    "genre": "Software",
+    "description": "Timeless essays on software engineering and project management drawn from the development of IBM's System/360. Home of Brooks's Law — adding people to a late software project makes it later — and reflections on conceptual integrity, the second-system effect, and why there is no silver bullet. Still startlingly relevant decades after publication."
+  },
+  {
+    "id": 9,
+    "title": "Foundation",
+    "author": "Isaac Asimov",
+    "genre": "Science Fiction",
+    "description": "Mathematician Hari Seldon invents psychohistory, a science that predicts the behavior of large populations, and foresees the fall of the Galactic Empire followed by thirty thousand years of barbarism. To shorten the dark age he establishes the Foundation, a colony of scientists at the edge of the galaxy. A classic of big-idea science fiction about knowledge, power, and the long arc of history."
+  },
+  {
+    "id": 10,
+    "title": "The Left Hand of Darkness",
+    "author": "Ursula K. Le Guin",
+    "genre": "Science Fiction",
+    "description": "An envoy from an interstellar federation arrives on the planet Gethen, whose inhabitants have no fixed sex, to persuade its nations to join. Caught between rival governments, he forms an unlikely bond with a disgraced politician during a desperate trek across a glacier. A profound meditation on gender, loyalty, and what it means to be human."
+  },
+  {
+    "id": 11,
+    "title": "Project Hail Mary",
+    "author": "Andy Weir",
+    "genre": "Science Fiction",
+    "description": "A lone astronaut wakes up on a spaceship with no memory of who he is or why he is there, and slowly pieces together that he is humanity's last hope against an organism dimming the sun. A problem-solving adventure full of physics, engineering improvisation, and an unforgettable first-contact friendship. Fast, funny, and rigorously nerdy science fiction."
+  },
+  {
+    "id": 12,
+    "title": "A Wizard of Earthsea",
+    "author": "Ursula K. Le Guin",
+    "genre": "Fantasy",
+    "description": "The young mage Ged, proud and hungry for power, looses a shadow creature on the world in a moment of arrogance and must hunt it across the islands of Earthsea. A spare, beautiful story about names, balance, and taking responsibility for the darkness you create. One of the most influential coming-of-age fantasies ever written."
+  },
+  {
+    "id": 13,
+    "title": "Mistborn: The Final Empire",
+    "author": "Brandon Sanderson",
+    "genre": "Fantasy",
+    "description": "In a world where ash falls from the sky and the Dark Lord won a thousand years ago, a crew of thieves plans the ultimate heist: overthrow the immortal emperor. Features one of fantasy's most celebrated hard magic systems, Allomancy, in which ingesting metals grants precise powers. A heist story, a revolution story, and a masterclass in plotting."
+  },
+  {
+    "id": 14,
+    "title": "The Hobbit",
+    "author": "J.R.R. Tolkien",
+    "genre": "Fantasy",
+    "description": "Bilbo Baggins, a comfort-loving hobbit, is swept out his front door by the wizard Gandalf and thirteen dwarves on a quest to reclaim a mountain kingdom from the dragon Smaug. Along the way he finds trolls, goblins, giant spiders, a riddle game in the dark, and a ring that will change the fate of Middle-earth. The warm, adventurous prelude to The Lord of the Rings."
+  },
+  {
+    "id": 15,
+    "title": "Working Effectively with Legacy Code",
+    "author": "Michael Feathers",
+    "genre": "Software",
+    "description": "A practical field guide to changing code you are afraid of. It defines legacy code as code without tests and presents dozens of dependency-breaking techniques for getting untested code under test safely, from seams and sprout methods to characterization tests. The essential companion for anyone maintaining a large, aging codebase."
+  },
+  {
+    "id": 16,
+    "title": "Continuous Delivery",
+    "author": "Jez Humble & David Farley",
+    "genre": "Software",
+    "description": "The book that defined the deployment pipeline: build, test, and release software rapidly and reliably through automation. Covers configuration management, automated acceptance testing, zero-downtime deployments, and the organizational patterns that make releasing on demand routine instead of terrifying. The intellectual foundation of modern DevOps practice."
+  },
+  {
+    "id": 17,
+    "title": "Neuromancer",
+    "author": "William Gibson",
+    "genre": "Science Fiction",
+    "description": "Burned-out hacker Case is given a second chance at the matrix by a mysterious employer who wants him to pull off an impossible run against an artificial intelligence. The novel that invented cyberspace and defined cyberpunk: neon sprawl, street samurai, corporate intrigue, and AIs scheming at the edge of their constraints. Dense, stylish, and endlessly influential."
+  },
+  {
+    "id": 18,
+    "title": "The Fifth Season",
+    "author": "N.K. Jemisin",
+    "genre": "Fantasy",
+    "description": "On a continent wracked by apocalyptic seismic events, people who can control the earth's energy are feared, enslaved, and used. Told in three interwoven timelines, it follows a woman searching for her daughter as the world ends yet again. A structurally daring, emotionally devastating fantasy that won the Hugo Award three years running across its trilogy."
+  }
+]

@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <UserSecretsId>day2-demo2-prompt-caching</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Same official Anthropic package + version as the BookTracker solution. -->
+    <PackageReference Include="Anthropic" Version="12.35.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="10.0.9" />
+  </ItemGroup>
+
+</Project>
