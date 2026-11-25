@@ -14,7 +14,7 @@
 - Multi-turn = **you** keep the history: stored turns map to the `Messages` list and the new user turn is appended on every call (the API is stateless).
 - **Prompt caching** with `CacheControlEphemeral`: call 1 *writes* the cache (`Usage.CacheCreationInputTokens` non-zero), call 2 *reads* it (`Usage.CacheReadInputTokens` non-zero) — and the cached input bills at **~10%** of normal.
 - Caching is a **byte-exact prefix match**: any change upstream (the demo's "silent invalidator" is a timestamp in the system prompt) invalidates everything below it.
-- The **model-dependent minimum prefix**: ~2,048 tokens on Sonnet 4.6 (~4,096 on Haiku/Opus). Below that the cache *silently* doesn't fire.
+- The **model-dependent minimum prefix**: 512 tokens on Opus 5.5 and Sonnet 5.5. Below that the cache *silently* doesn't fire.
 
 ## Prerequisites / setup
 
@@ -42,7 +42,7 @@
 
 2. **Show the system prompt (2 min).** Open [`src/Demo2.PromptCaching/Program.cs`](src/Demo2.PromptCaching/Program.cs), scroll to `BuildSystemPrompt` at the bottom:
    - A real BookTracker domain briefing: role, style rules, domain model, worked examples, plus a 150-book catalog snapshot.
-   - Narrate: *"It's deliberately big. Caching has a model-dependent minimum — about 2,048 tokens on Sonnet 4.6. A three-line system prompt silently never caches; `CacheCreationInputTokens` just stays 0. Pad the prompt with real domain content and the cache actually fires."*
+   - Narrate: *"It's deliberately big. Caching has a model-dependent minimum — 512 tokens on Opus 5.5. A three-line system prompt silently never caches; `CacheCreationInputTokens` just stays 0. Pad the prompt with real domain content and the cache actually fires."*
    - Point at the `--break-cache` block at the top of the method — *"ignore that for now; it's the sabotage switch."*
 
 3. **Show the two mechanisms (2 min).** Scroll up:
@@ -104,7 +104,7 @@
 - **`CacheReadInputTokens` stays 0 (without `--break-cache`):** the prefix changed between calls or is too small. Checklist, in order:
   1. Did you accidentally run with `--break-cache`? Re-run plain.
   2. More than ~5 minutes between the two calls? The ephemeral cache TTL expired — the demo makes both calls in one process, so this only bites if you're re-running call-by-call. Re-run the app.
-  3. System prompt under the minimum (~2,048 tokens on Sonnet 4.6)? The app prints its size at startup — if someone trimmed `BuildSystemPrompt`, restore the catalog loop.
+  3. System prompt under the minimum (512 tokens on Opus 5.5)? The app prints its size at startup — if someone trimmed `BuildSystemPrompt`, restore the catalog loop.
   Turn the failure into the lesson: this exact debugging path is the teaching point.
 - **Auth fails:** same as Demo 1 — `dotnet user-secrets set "Anthropic:ApiKey" "sk-ant-..."` from *this* project folder (separate `UserSecretsId`), or fall back to `ANTHROPIC_API_KEY`.
 - **429 / 529:** transient; re-run. Note the SDK's built-in retries and the Polly discussion coming in Block 1C.
@@ -114,6 +114,6 @@
 
 - **Caching is a prefix match.** Byte-exact, top-down. Any change upstream — a timestamp, a reordered field, one edited word — invalidates everything after it. Structure prompts stable-first.
 - **It fails silently.** No error, no warning — just `CacheReadInputTokens: 0` and a 10x bill. `Usage` is your only proof caching works; check it.
-- **Minimum cacheable size is model-dependent.** ~2,048 tokens on Sonnet 4.6, ~4,096 on Haiku/Opus. Short system prompts never cache — make the cached content substantial (domain briefing, RAG context, few-shot examples).
+- **Minimum cacheable size is model-dependent.** 512 tokens on Opus 5.5 and Sonnet 5.5, up to 4,096 on older models. Short system prompts never cache — make the cached content substantial (domain briefing, RAG context, few-shot examples).
 - **Cache writes cost a small premium; reads bill at ~10%.** Caching wins whenever the prefix is stable and shared across repeat calls — exactly the system-prompt case.
 - **History is yours to manage.** The message list is the conversation. In Lab 1, attendees persist it in `IDistributedCache` keyed by session id — this demo's `List<MessageParam>` is the in-memory version of the same idea.

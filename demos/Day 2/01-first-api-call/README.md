@@ -94,6 +94,6 @@ This is the "Day 2 opens with code, not slides" moment — a real Claude respons
 
 - **The API is stateless.** No conversation lives on Anthropic's side; every call is self-contained. This is the setup for Demo 2's history management.
 - **`Usage` is how you see cost.** Every response carries exact input/output token counts — build cost visibility in from call one.
-- **Sonnet is the app default.** Haiku when cheap-and-fast wins, Opus when the problem is genuinely hard; the model is one enum value away.
+- **Opus 5.5 is the app default.** Sonnet 5.5 when cheap-and-fast wins; the model is one enum value away.
 - **Secrets hygiene from minute one.** User-secrets (or env vars) — the key never appears in code, config, or git. Same rule the whole workshop enforces.
 - **Always set `MaxTokens`.** It's a required ceiling — it caps your worst-case bill for the reply.

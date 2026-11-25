@@ -37,10 +37,10 @@ CLAUDE.md                      Solution-level instructions (loaded every session
     summarize-changes/           diff summary + risk flags (uses dynamic context injection)
   agents/                      Subagents with isolated context
     code-reviewer.md             senior review of recent changes (inherits model)
-    test-writer.md               mechanical test generation (Haiku — ~cheap)
+    test-writer.md               mechanical test generation (Sonnet)
     security-auditor.md          read-only audit with persistent project memory
     perf-analyzer.md             EF/async/allocation performance analysis
-    docs-writer.md               XML docs, endpoint docs, ADRs (Haiku)
+    docs-writer.md               XML docs, endpoint docs, ADRs (Sonnet)
     migration-planner.md         phased modernization plans with effort estimates
   commands/                    Explicit-invocation prompts (/name)
     security-review.md  commit.md  pr-description.md  api-docs.md
@@ -84,19 +84,19 @@ Then make a deliberate syntax error in a `.cs` file and ask Claude to save it �
 ## Customizing
 
 - Tighten or loosen `permissions.allow`/`deny` in `settings.json` first — it's the highest-leverage safety dial.
-- Subagent models: `test-writer` and `docs-writer` run on Haiku deliberately; switch `model:` to `sonnet`/`inherit` if you want more judgment at more cost.
+- Subagent models: `test-writer` and `docs-writer` run on Sonnet deliberately; switch `model:` to `opus`/`inherit` if you want more judgment at more cost.
 
 ### Choosing a model per agent
 
-Set the `model:` field in each agent's frontmatter. One agent = one model; to run the same role at two capability levels, create two agent files (e.g. `quick-reviewer` on `haiku`, `deep-reviewer` on `inherit`).
+Set the `model:` field in each agent's frontmatter. One agent = one model; to run the same role at two capability levels, create two agent files (e.g. `quick-reviewer` on `sonnet`, `deep-reviewer` on `inherit`).
 
 | Task profile | `model:` value | Why | Kit examples |
 | --- | --- | --- | --- |
-| Mechanical, high-volume (test generation, doc writing, formatting-level edits) | `haiku` | Cheapest and fastest; the procedure in the prompt does the heavy lifting | `test-writer`, `docs-writer` |
+| Mechanical, high-volume (test generation, doc writing, formatting-level edits) | `sonnet` | Cheaper and faster than Opus; the procedure in the prompt does the heavy lifting | `test-writer`, `docs-writer` |
 | Judgment-heavy (review, audits, performance analysis, planning) | `inherit` | Analysis quality tracks whatever model your session runs | `code-reviewer`, `security-auditor`, `perf-analyzer`, `migration-planner` |
-| Reproducibility across a team or CI (identical behavior everywhere, always) | full model string, e.g. `claude-haiku-4-5-20251001` | Aliases float to newer versions; a pinned string never changes under you | — (opt in per team) |
+| Reproducibility across a team or CI (identical behavior everywhere, always) | full model string, e.g. `claude-sonnet-5-5` | Aliases float to newer versions; a pinned string never changes under you | — (opt in per team) |
 | No strong opinion | omit the field | Falls back to the configured default subagent model | — |
 
-Rule of thumb: if the agent's prompt is a checklist, Haiku executes it well; if the agent must notice what the checklist missed, inherit your session's model.
+Rule of thumb: if the agent's prompt is a checklist, Sonnet executes it well; if the agent must notice what the checklist missed, inherit your session's model.
 - Personal preferences go in `~/.claude/CLAUDE.md` or `~/.claude/rules/`, not this project's files.
 - The `security-auditor` uses `memory: project` — its accumulated findings live in `.claude/agent-memory/security-auditor/` and can be committed to share institutional knowledge.

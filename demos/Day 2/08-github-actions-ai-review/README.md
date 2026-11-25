@@ -13,7 +13,7 @@
 
 - The **review skill, now in CI**: the same code review attendees ran locally with `/code-review` on Day 1 becomes an automated PR gate — the Day 1 steering touchpoint made concrete.
 - The cleanest path is the **official `anthropics/claude-code-action`** — it handles checkout, diff, and PR plumbing and posts the comment for you. The DIY alternative is Claude Code **headless** (`claude -p`, print mode) over the diff plus `gh pr comment`.
-- **Cost tiering in CI**: `--model claude-haiku-4-5` is the right tier for mechanical review work and keeps every PR review cheap.
+- **Cost tiering in CI**: `--model claude-sonnet-5-5` is the right tier for mechanical review work and keeps every PR review cheap.
 - What the review hunts for: security issues, .NET issues, missing error handling, and **CLAUDE.md / `.claude/rules/` violations** — your project conventions become enforceable review criteria.
 
 Artifacts in this folder:
@@ -40,7 +40,7 @@ Everything here is on `artifacts/demo-pr-checklist.md` in more detail — the sh
    - `on: pull_request` — every PR against `main` gets reviewed.
    - `anthropics/claude-code-action@v1` — "the official action. It checks out, diffs the PR, runs the review, and posts the comment. You bring two things: the API key secret and the prompt."
    - The prompt — "security, .NET issues, missing error handling, and CLAUDE.md violations. Your conventions file just became a review rubric."
-   - `--model claude-haiku-4-5` — "Haiku in CI. Mechanical review work doesn't need the big model, and this keeps every PR at pennies."
+   - `--model claude-sonnet-5-5` — "Sonnet 5.5 in CI. Mechanical review work doesn't need Opus, and this keeps every PR at pennies."
    - Scroll to the commented block at the bottom: "If you'd rather own the plumbing: `claude -p` — print mode, headless — over the raw diff, then `gh pr comment`. Same review, more control. Lab 5 Part C lets you pick either."
 
 3. **Open the PR (live moment).** Bring up the staged draft PR in the browser and click **Ready for review** (or, from the terminal):
@@ -57,9 +57,9 @@ Everything here is on `artifacts/demo-pr-checklist.md` in more detail — the sh
 
    **Expected output:** an AI review comment on the PR — a short markdown bullet list of findings with file references. With the staged bait, it should flag the SQL interpolation / missing validation you planted. Read the best finding aloud: "It caught the injection. Nobody on your team had to remember to look."
 
-6. **Land it (45 s).** "Two things to take away. One: this is the *same* review skill from Day 1 — local `/code-review` and this workflow share the rubric. Two: Haiku makes it cheap enough to run on literally every PR. Lab 5 Part C: you wire this into your own fork in about eight minutes — the YAML is provided."
+6. **Land it (45 s).** "Two things to take away. One: this is the *same* review skill from Day 1 — local `/code-review` and this workflow share the rubric. Two: Sonnet 5.5 makes it cheap enough to run on literally every PR. Lab 5 Part C: you wire this into your own fork in about eight minutes — the YAML is provided."
 
-7. **Hand off to Lab 5.** Mention Part D uses the identical headless pattern for release notes on tag push — commits in, grouped notes out, Haiku again.
+7. **Hand off to Lab 5.** Mention Part D uses the identical headless pattern for release notes on tag push — commits in, grouped notes out, Sonnet 5.5 again.
 
 ## Recovery
 
@@ -74,6 +74,6 @@ Everything here is on `artifacts/demo-pr-checklist.md` in more detail — the sh
 
 - "This is the Day 1 steering touchpoint paying off: the CI review *is* a code-quality skill — the same `/code-review` you run locally, now triggered on every PR."
 - "The official action handles the plumbing — checkout, diff, comment. You bring the key and the rubric."
-- "Haiku keeps CI cheap — the right model tier for mechanical review work."
+- "Sonnet 5.5 keeps CI cheap — the right model tier for mechanical review work."
 - "CLAUDE.md violations are a review category. Your conventions doc is now enforced, not aspirational."
 - "diff → review → comment. Once you see the shape, release notes on tag push is the same machine with a different prompt."
