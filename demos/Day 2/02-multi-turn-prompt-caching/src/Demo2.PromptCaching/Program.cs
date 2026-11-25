@@ -49,7 +49,7 @@ Console.WriteLine();
 // Multi-turn = we own the history. Every call replays the full message list.
 var history = new List<MessageParam>
 {
-    new() { Role = Role.User, Content = "Recommend a book like Dune, in two sentences." },
+    new UserMessageParam("Recommend a book like Dune, in two sentences."),
 };
 
 var first = await SendAsync(client, systemPrompt, history, cts.Token);
@@ -57,8 +57,8 @@ Console.WriteLine($"Assistant: {ExtractText(first)}");
 PrintUsage("Call 1 (expect a cache WRITE)", first.Usage);
 
 // Append the assistant reply and the next user turn — this is history management.
-history.Add(new MessageParam { Role = Role.Assistant, Content = ExtractText(first) });
-history.Add(new MessageParam { Role = Role.User, Content = "Now recommend one that is nothing like it, in two sentences." });
+history.Add(new AssistantMessageParam(ExtractText(first)));
+history.Add(new UserMessageParam("Now recommend one that is nothing like it, in two sentences."));
 
 var second = await SendAsync(client, systemPrompt, history, cts.Token);
 Console.WriteLine($"Assistant: {ExtractText(second)}");
@@ -84,8 +84,8 @@ static async Task<Message> SendAsync(
 {
     return await client.Messages.Create(new MessageCreateParams
     {
-        Model = Model.ClaudeSonnet4_6,
-        MaxTokens = 1024,
+        Model = Model.ClaudeOpus5_5,
+        MaxTokens = 4096,
         // CacheControlEphemeral marks everything up to and including this block as cacheable.
         System = new List<TextBlockParam>
         {

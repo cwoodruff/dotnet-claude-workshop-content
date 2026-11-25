@@ -9,7 +9,7 @@
 
   <ItemGroup>
     <!-- Same versions as src/BookTracker — keep them in sync. -->
-    <PackageReference Include="Anthropic" Version="12.35.1" />
+    <PackageReference Include="Anthropic" Version="13.14.0" />
     <PackageReference Include="Microsoft.Extensions.AI" Version="10.7.0" />
     <PackageReference Include="OllamaSharp" Version="5.4.25" />
     <PackageReference Include="Qdrant.Client" Version="1.18.1" />

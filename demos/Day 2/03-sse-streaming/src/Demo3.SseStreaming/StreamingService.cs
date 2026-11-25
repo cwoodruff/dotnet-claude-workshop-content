@@ -20,9 +20,9 @@ public class StreamingService
     {
         var parameters = new MessageCreateParams
         {
-            Model = Model.ClaudeSonnet4_6,
-            MaxTokens = 1024,
-            Messages = [new() { Role = Role.User, Content = prompt }],
+            Model = Model.ClaudeOpus5_5,
+            MaxTokens = 4096,
+            Messages = [new UserMessageParam(prompt)],
         };
 
         // CreateStreaming returns an IAsyncEnumerable of stream events; pick out the text deltas.

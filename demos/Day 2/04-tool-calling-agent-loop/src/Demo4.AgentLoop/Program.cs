@@ -49,14 +49,14 @@ logger.LogInformation("User prompt: {Prompt}", prompt);
 const int MaxIterations = 5;
 var inputTokens = 0L;
 var outputTokens = 0L;
-List<MessageParam> messages = [new() { Role = Role.User, Content = prompt }];
+List<MessageParam> messages = [new UserMessageParam(prompt)];
 
 for (var iteration = 1; iteration <= MaxIterations; iteration++)
 {
     var response = await client.Messages.Create(new MessageCreateParams
     {
-        Model = Model.ClaudeSonnet4_6,
-        MaxTokens = 1024,
+        Model = Model.ClaudeOpus5_5,
+        MaxTokens = 4096,
         System = new List<TextBlockParam>
         {
             new()
@@ -100,13 +100,27 @@ for (var iteration = 1; iteration <= MaxIterations; iteration++)
         return;
     }
 
-    // Echo the assistant's turn (text + tool_use blocks) back into the history ...
+    // Echo the assistant's turn (thinking, text and tool_use blocks, in order) back into the history ...
     var assistantContent = new List<ContentBlockParam>();
     foreach (var block in response.Content)
     {
         if (block.TryPickText(out TextBlock? text))
         {
             assistantContent.Add(new TextBlockParam { Text = text.Text });
+        }
+        else if (block.TryPickThinking(out ThinkingBlock? thinking))
+        {
+            // Thinking is on by default on current models. When a tool result follows, the API
+            // expects the thinking blocks back unchanged, signature included, in the same order.
+            assistantContent.Add(new ThinkingBlockParam
+            {
+                Thinking = thinking.Thinking,
+                Signature = thinking.Signature,
+            });
+        }
+        else if (block.TryPickRedactedThinking(out RedactedThinkingBlock? redacted))
+        {
+            assistantContent.Add(new RedactedThinkingBlockParam(redacted.Data));
         }
         else if (block.TryPickToolUse(out ToolUseBlock? toolUse))
         {
@@ -119,7 +133,7 @@ for (var iteration = 1; iteration <= MaxIterations; iteration++)
         }
     }
 
-    messages.Add(new MessageParam { Role = Role.Assistant, Content = assistantContent });
+    messages.Add(new AssistantMessageParam(assistantContent));
 
     // ... execute each requested tool and send the matching tool_result blocks as the next user turn.
     var toolResults = new List<ContentBlockParam>();
@@ -154,7 +168,7 @@ for (var iteration = 1; iteration <= MaxIterations; iteration++)
         });
     }
 
-    messages.Add(new MessageParam { Role = Role.User, Content = toolResults });
+    messages.Add(new UserMessageParam(toolResults));
 }
 
 logger.LogWarning(

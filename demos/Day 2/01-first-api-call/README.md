@@ -11,7 +11,7 @@
 ## What this demo teaches
 
 - Everything goes through `client.Messages.Create` — pick a model, set a `MaxTokens` ceiling, pass the messages.
-- Model choice: `Model.ClaudeSonnet4_6` is the app default (Haiku for cheap, Opus for hard).
+- Model choice: `Model.ClaudeOpus5_5` is the app default (Sonnet 5.5 for mechanical work).
 - Reading `response.Usage.InputTokens` / `OutputTokens` — `Usage` is how you see cost.
 - The API is **stateless**: this one call carries everything the model sees.
 - The API key lives in **user-secrets**, never in code or committed config.
@@ -46,15 +46,15 @@ This is the "Day 2 opens with code, not slides" moment — a real Claude respons
 2. **Show the project (1 min).** Open [`src/Demo1.FirstApiCall/Demo1.FirstApiCall.csproj`](src/Demo1.FirstApiCall/Demo1.FirstApiCall.csproj). Point at the single package:
 
    ```xml
-   <PackageReference Include="Anthropic" Version="12.31.0" />
+   <PackageReference Include="Anthropic" Version="13.14.0" />
    ```
 
-   Narrate: *"The official `Anthropic` package, v12.x — the one Anthropic maintains and the one BookTracker uses. Watch the name: the old `tryAGI.Anthropic` v3.x is a different lineage."*
+   Narrate: *"The official `Anthropic` package, v13.x — the one Anthropic maintains and the one BookTracker uses. Watch the name: the old `tryAGI.Anthropic` v3.x is a different lineage."*
 
 3. **Walk the code (3 min).** Open [`src/Demo1.FirstApiCall/Program.cs`](src/Demo1.FirstApiCall/Program.cs) and walk it top to bottom:
    - The key comes from **user-secrets** via `ConfigurationBuilder` — *"no key in code, no key in appsettings, nothing to accidentally commit."*
    - `new AnthropicClient { ApiKey = apiKey }` — *"in ASP.NET Core this is registered as a Singleton because it holds an `HttpClient`; Scoped or Transient means socket exhaustion."*
-   - The `Messages.Create` call — model, `MaxTokens = 1024`, one user message. Point out the `CancellationToken` flowing in.
+   - The `Messages.Create` call — model, `MaxTokens = 4096`, one user message. Point out the `CancellationToken` flowing in.
    - The `OfType<TextBlock>()` filter — *"`ContentBlock` is a union; today we only want the text blocks."*
 
 4. **Run it (2 min).**

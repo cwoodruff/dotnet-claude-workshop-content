@@ -23,7 +23,7 @@ same URL, same commands.
   Code). Today you *built* one — in C#, on ASP.NET Core." This is the emotional high point of the
   section; lean into it.
 - The official C# SDK surface: **`ModelContextProtocol`** + **`ModelContextProtocol.AspNetCore`**
-  (v1.4.0) — `AddMcpServer().WithHttpTransport().WithToolsFromAssembly()` in DI, `app.MapMcp()` on
+  (v2.4.0) — `AddMcpServer().WithHttpTransport().WithToolsFromAssembly()` in DI, `app.MapMcp()` on
   the pipeline. Three lines to become an MCP host.
 - Transport is **Streamable HTTP** — the current standard, not the older HTTP+SSE. `MapMcp()`
   serves it at the **root** of the app, so the URL clients register is just
