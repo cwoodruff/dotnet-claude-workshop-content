@@ -8,9 +8,9 @@ public class AnthropicOptions
 {
     public string ApiKey { get; set; } = string.Empty;
 
-    public string Model { get; set; } = "claude-sonnet-4-6";
+    public string Model { get; set; } = "claude-opus-5-5";
 
-    public int MaxTokens { get; set; } = 1024;
+    public int MaxTokens { get; set; } = 4096;
 
     public string SystemPrompt { get; set; } = string.Empty;
 }

@@ -25,6 +25,51 @@ public class AnthropicAgentLlm : IAgentLlm
     public IAgentConversation StartConversation(string userMessage)
         => new AnthropicAgentConversation(_client, _options, userMessage);
 
+    /// <summary>
+    /// Turns a response's content into the assistant turn to send back with tool results. Thinking,
+    /// text and tool_use blocks are kept in their original order; dropping a thinking block makes the
+    /// next call fail.
+    /// </summary>
+    public static List<ContentBlockParam> ToAssistantContent(IReadOnlyList<ContentBlock> content)
+    {
+        var assistantContent = new List<ContentBlockParam>();
+        foreach (var block in content)
+        {
+            if (block.TryPickText(out TextBlock? text))
+            {
+                assistantContent.Add(new TextBlockParam { Text = text.Text });
+            }
+            else if (block.TryPickThinking(out ThinkingBlock? thinking))
+            {
+                // Thinking is on by default on current models. When a tool result follows, the API
+                // expects the thinking blocks back unchanged, signature included, in the same order.
+                assistantContent.Add(new ThinkingBlockParam
+                {
+                    Thinking = thinking.Thinking,
+                    Signature = thinking.Signature,
+                });
+            }
+            else if (block.TryPickRedactedThinking(out RedactedThinkingBlock? redacted))
+            {
+                assistantContent.Add(new RedactedThinkingBlockParam(redacted.Data));
+            }
+            else if (block.TryPickToolUse(out ToolUseBlock? toolUse))
+            {
+                assistantContent.Add(new ToolUseBlockParam
+                {
+                    ID = toolUse.ID,
+                    Name = toolUse.Name,
+                    Input = toolUse.Input,
+                });
+            }
+        }
+
+        return assistantContent;
+    }
+
+    private const string MaxTokensMessage =
+        "Stopped: the reply hit the MaxTokens limit before it finished. Raise Anthropic:MaxTokens.";
+
     private sealed class AnthropicAgentConversation : IAgentConversation
     {
         private readonly AnthropicClient _client;
@@ -36,7 +81,7 @@ public class AnthropicAgentLlm : IAgentLlm
         {
             _client = client;
             _options = options;
-            _messages = [new() { Role = Role.User, Content = userMessage }];
+            _messages = [new UserMessageParam(userMessage)];
         }
 
         public Task<AgentTurn> SendUserMessageAsync(CancellationToken ct = default) => CreateAsync(ct);
@@ -45,26 +90,8 @@ public class AnthropicAgentLlm : IAgentLlm
             IReadOnlyList<AgentToolOutcome> outcomes,
             CancellationToken ct = default)
         {
-            // Echo the assistant's previous turn (text + tool_use blocks) ...
-            var assistantContent = new List<ContentBlockParam>();
-            foreach (var block in _lastResponse!.Content)
-            {
-                if (block.TryPickText(out TextBlock? text))
-                {
-                    assistantContent.Add(new TextBlockParam { Text = text.Text });
-                }
-                else if (block.TryPickToolUse(out ToolUseBlock? toolUse))
-                {
-                    assistantContent.Add(new ToolUseBlockParam
-                    {
-                        ID = toolUse.ID,
-                        Name = toolUse.Name,
-                        Input = toolUse.Input,
-                    });
-                }
-            }
-
-            _messages.Add(new MessageParam { Role = Role.Assistant, Content = assistantContent });
+            // Echo the assistant's previous turn (thinking, text and tool_use blocks, in order) ...
+            _messages.Add(new AssistantMessageParam(ToAssistantContent(_lastResponse!.Content)));
 
             // ... then the matching tool_result blocks as the next user turn.
             var toolResults = outcomes
@@ -75,7 +102,7 @@ public class AnthropicAgentLlm : IAgentLlm
                     IsError = o.IsError,
                 })
                 .ToList();
-            _messages.Add(new MessageParam { Role = Role.User, Content = toolResults });
+            _messages.Add(new UserMessageParam(toolResults));
 
             return CreateAsync(ct);
         }
@@ -95,6 +122,13 @@ public class AnthropicAgentLlm : IAgentLlm
             }, cancellationToken: ct);
 
             _lastResponse = response;
+
+            if (response.StopReason == "max_tokens")
+            {
+                // MaxTokens covers thinking plus the reply. Hitting it mid-turn is a config problem,
+                // not an answer, so say so instead of returning a cut-off reply.
+                return new AgentTurn(MaxTokensMessage, []);
+            }
 
             var finalText = string.Concat(
                 response.Content.Select(b => b.Value).OfType<TextBlock>().Select(t => t.Text));

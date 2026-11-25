@@ -28,12 +28,10 @@ public class ClaudeService : IClaudeService
         CancellationToken ct = default)
     {
         var messages = history
-            .Select(t => new MessageParam
-            {
-                Role = t.Role == "assistant" ? Role.Assistant : Role.User,
-                Content = t.Content,
-            })
-            .Append(new MessageParam { Role = Role.User, Content = userMessage })
+            .Select(t => t.Role == "assistant"
+                ? (MessageParam)new AssistantMessageParam(t.Content)
+                : new UserMessageParam(t.Content))
+            .Append(new UserMessageParam(userMessage))
             .ToList();
 
         // The Anthropic API is stateless — the full history is sent every call. The system prompt is

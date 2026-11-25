@@ -64,7 +64,7 @@ public class RagService : IRagService
                 new() { Text = context.ToString(), CacheControl = new CacheControlEphemeral() },
             },
             // Wrap the untrusted query as data; the retrieved context stays in the cached system block.
-            Messages = [new() { Role = Role.User, Content = PromptSafety.Wrap(query) }],
+            Messages = [new UserMessageParam(PromptSafety.Wrap(query))],
         }, cancellationToken: ct);
 
         var reply = string.Concat(

@@ -33,7 +33,7 @@ public class AgentService : IAgentService
     {
         var messages = new List<MessageParam>
         {
-            new() { Role = Role.User, Content = message },
+            new UserMessageParam(message),
         };
         var toolCalls = new List<AgentToolCall>();
 
@@ -51,6 +51,15 @@ public class AgentService : IAgentService
                 Tools = BookTrackerTools.Definitions.Select(t => (ToolUnion)t).ToList(),
             }, cancellationToken: ct);
 
+            if (response.StopReason == "max_tokens")
+            {
+                // MaxTokens covers thinking plus the reply. Hitting it mid-turn is a config problem,
+                // not an answer, so say so instead of returning a cut-off reply.
+                return new AgentResult(
+                    "Stopped: the reply hit the MaxTokens limit before it finished. Raise Anthropic:MaxTokens.",
+                    toolCalls);
+            }
+
             if (response.StopReason != "tool_use")
             {
                 var finalText = string.Concat(
@@ -58,7 +67,8 @@ public class AgentService : IAgentService
                 return new AgentResult(finalText, toolCalls);
             }
 
-            // Rebuild the assistant turn and execute each requested tool.
+            // Rebuild the assistant turn (thinking, text and tool_use blocks, in order) and execute each
+            // requested tool.
             var assistantContent = new List<ContentBlockParam>();
             var toolResults = new List<ContentBlockParam>();
 
@@ -67,6 +77,20 @@ public class AgentService : IAgentService
                 if (block.TryPickText(out TextBlock? text))
                 {
                     assistantContent.Add(new TextBlockParam { Text = text.Text });
+                }
+                else if (block.TryPickThinking(out ThinkingBlock? thinking))
+                {
+                    // Thinking is on by default on current models. When a tool result follows, the API
+                    // expects the thinking blocks back unchanged, signature included, in the same order.
+                    assistantContent.Add(new ThinkingBlockParam
+                    {
+                        Thinking = thinking.Thinking,
+                        Signature = thinking.Signature,
+                    });
+                }
+                else if (block.TryPickRedactedThinking(out RedactedThinkingBlock? redacted))
+                {
+                    assistantContent.Add(new RedactedThinkingBlockParam(redacted.Data));
                 }
                 else if (block.TryPickToolUse(out ToolUseBlock? toolUse))
                 {
@@ -102,8 +126,8 @@ public class AgentService : IAgentService
                 }
             }
 
-            messages.Add(new MessageParam { Role = Role.Assistant, Content = assistantContent });
-            messages.Add(new MessageParam { Role = Role.User, Content = toolResults });
+            messages.Add(new AssistantMessageParam(assistantContent));
+            messages.Add(new UserMessageParam(toolResults));
         }
 
         return new AgentResult(

@@ -34,7 +34,7 @@ public class StreamingService : IStreamingService
             {
                 new() { Text = _options.SystemPrompt, CacheControl = new CacheControlEphemeral() },
             },
-            Messages = [new() { Role = Role.User, Content = prompt }],
+            Messages = [new UserMessageParam(prompt)],
         };
 
         await foreach (var ev in _client.Messages.CreateStreaming(parameters, cancellationToken: ct))
