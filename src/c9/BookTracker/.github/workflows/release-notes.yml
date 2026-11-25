@@ -62,7 +62,7 @@ jobs:
               Changes, and refactor/test/chore/docs/build/ci -> Developer Notes.
             - Group related commits and drop noise (merge commits, trivial formatting).
             - Keep it crisp and factual. Output only the Markdown notes, no preamble.
-        run: claude -p "$PROMPT" --model claude-haiku-4-5 < commits.txt > notes.md
+        run: claude -p "$PROMPT" --model claude-sonnet-5-5 < commits.txt > notes.md
 
       - name: Publish release
         env:

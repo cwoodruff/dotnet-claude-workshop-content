@@ -62,7 +62,7 @@ public class RagService : IRagService
             {
                 new() { Text = context.ToString(), CacheControl = new CacheControlEphemeral() },
             },
-            Messages = [new() { Role = Role.User, Content = query }],
+            Messages = [new UserMessageParam(query)],
         }, cancellationToken: ct);
 
         var reply = string.Concat(

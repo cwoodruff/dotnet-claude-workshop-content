@@ -31,12 +31,10 @@ public class ClaudeService : IClaudeService
         // Structural separation: user text is wrapped in <user_input> in the USER turn (never the
         // system prompt), and the system prompt tells the model to treat it as data, not instructions.
         var messages = history
-            .Select(t => new MessageParam
-            {
-                Role = t.Role == "assistant" ? Role.Assistant : Role.User,
-                Content = t.Role == "assistant" ? t.Content : PromptSafety.Wrap(t.Content),
-            })
-            .Append(new MessageParam { Role = Role.User, Content = PromptSafety.Wrap(userMessage) })
+            .Select(t => t.Role == "assistant"
+                ? (MessageParam)new AssistantMessageParam(t.Content)
+                : new UserMessageParam(PromptSafety.Wrap(t.Content)))
+            .Append(new UserMessageParam(PromptSafety.Wrap(userMessage)))
             .ToList();
 
         // The Anthropic API is stateless — the full history is sent every call. The system prompt is

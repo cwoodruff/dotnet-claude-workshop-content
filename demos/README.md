@@ -19,6 +19,6 @@ self-contained .NET solution in `src/`.
 | `08-github-actions-ai-review` | Demo 8: GitHub Actions AI review on a PR | Day2-Section5-AI-Testing-CICD.pptx |  | `artifacts/ai-code-review.yml` |
 | `09-prompt-injection` | Demo 9: Prompt injection (make it visceral) | Day2-Section6-Responsible-AI-WrapUp.pptx |  | `src/` Minimal API (port 5099) |
 
-All Day 2 projects target `net10.0`, use the same `Anthropic` 12.31.0 NuGet package as
+All Day 2 projects target `net10.0`, use the same `Anthropic` 13.14.0 NuGet package as
 BookTracker, read the API key from user-secrets (`Anthropic:ApiKey`) with an
 `ANTHROPIC_API_KEY` env-var fallback, and build with zero warnings. None contain secrets.

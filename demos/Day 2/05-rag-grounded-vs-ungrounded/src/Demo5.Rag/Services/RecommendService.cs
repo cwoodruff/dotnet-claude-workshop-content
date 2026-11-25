@@ -66,7 +66,7 @@ public class RecommendService
             Model = _anthropic.Model,
             MaxTokens = _anthropic.MaxTokens,
             System = new List<TextBlockParam> { new() { Text = systemPrompt } },
-            Messages = [new() { Role = Role.User, Content = query }],
+            Messages = [new UserMessageParam(query)],
         }, cancellationToken: ct);
 
         return new RecommendResult(
@@ -107,7 +107,7 @@ public class RecommendService
             {
                 new() { Text = context.ToString(), CacheControl = new CacheControlEphemeral() },
             },
-            Messages = [new() { Role = Role.User, Content = query }],
+            Messages = [new UserMessageParam(query)],
         }, cancellationToken: ct);
 
         return new RecommendResult(

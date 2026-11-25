@@ -44,9 +44,9 @@ app.MapPost("/api/naive/summarize", async (
 
     var response = await client.Messages.Create(new MessageCreateParams
     {
-        Model = Model.ClaudeSonnet4_6,
-        MaxTokens = 1024,
-        Messages = [new() { Role = Role.User, Content = prompt }],
+        Model = Model.ClaudeOpus5_5,
+        MaxTokens = 4096,
+        Messages = [new UserMessageParam(prompt)],
     }, cancellationToken: ct);
 
     return Results.Ok(new SummarizeResponse(
@@ -71,10 +71,10 @@ app.MapPost("/api/hardened/summarize", async (
 
     var response = await client.Messages.Create(new MessageCreateParams
     {
-        Model = Model.ClaudeSonnet4_6,
-        MaxTokens = 1024,
+        Model = Model.ClaudeOpus5_5,
+        MaxTokens = 4096,
         System = new List<TextBlockParam> { new() { Text = systemPrompt } },
-        Messages = [new() { Role = Role.User, Content = wrappedInput }],
+        Messages = [new UserMessageParam(wrappedInput)],
     }, cancellationToken: ct);
 
     return Results.Ok(new SummarizeResponse(

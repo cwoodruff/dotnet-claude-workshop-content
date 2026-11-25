@@ -34,9 +34,9 @@ Console.WriteLine();
 
 var response = await client.Messages.Create(new MessageCreateParams
 {
-    Model = Model.ClaudeSonnet4_6,   // app default; Haiku for cheap, Opus for hard
-    MaxTokens = 1024,                // hard ceiling on the reply — always set one
-    Messages = [new() { Role = Role.User, Content = prompt }],
+    Model = Model.ClaudeOpus5_5,   // app default; Sonnet for mechanical work
+    MaxTokens = 4096,                // hard ceiling on thinking + reply — always set one
+    Messages = [new UserMessageParam(prompt)],
 }, cancellationToken: cts.Token);
 
 // ContentBlock is a union type — filter to the text blocks.

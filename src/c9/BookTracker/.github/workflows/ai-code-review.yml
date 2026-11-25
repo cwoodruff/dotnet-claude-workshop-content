@@ -59,7 +59,7 @@ jobs:
 
             For each finding, cite the file and, where possible, the relevant hunk, explain
             the risk, and suggest a concrete fix.
-        run: claude -p "$PROMPT" --model claude-haiku-4-5 < pr.diff > review.md
+        run: claude -p "$PROMPT" --model claude-sonnet-5-5 < pr.diff > review.md
 
       - name: Post review comment
         env:

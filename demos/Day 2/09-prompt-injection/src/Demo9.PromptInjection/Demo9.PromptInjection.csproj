@@ -9,7 +9,7 @@
 
   <ItemGroup>
     <!-- Same official Anthropic package + version as the BookTracker solution. -->
-    <PackageReference Include="Anthropic" Version="12.35.1" />
+    <PackageReference Include="Anthropic" Version="13.14.0" />
   </ItemGroup>
 
 </Project>
