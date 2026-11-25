@@ -39,8 +39,8 @@ if (string.IsNullOrWhiteSpace(apiKey))
 
 var client = new AnthropicClient { ApiKey = apiKey };
 
-// The system prompt must clear the model-dependent minimum prefix (~2,048 tokens on Sonnet 4.6,
-// ~4,096 on Haiku/Opus) or the cache SILENTLY won't fire and CacheCreationInputTokens stays 0.
+// The system prompt must clear the model-dependent minimum prefix (512 tokens on Opus 5.5 and
+// Sonnet 5.5) or the cache SILENTLY won't fire and CacheCreationInputTokens stays 0.
 var systemPrompt = BuildSystemPrompt(breakCache);
 Console.WriteLine($"System prompt: {systemPrompt.Length:N0} chars (~{systemPrompt.Length / 4:N0} tokens)"
     + (breakCache ? "  [--break-cache: timestamp prepended — prefix changes every run]" : ""));
@@ -109,8 +109,8 @@ static void PrintUsage(string label, Usage usage)
     Console.WriteLine();
 }
 
-// Builds a deliberately LARGE, byte-stable BookTracker domain briefing (safely above the ~2,048
-// token minimum on Sonnet 4.6). With breakCache, a timestamp is prepended — the classic silent
+// Builds a deliberately LARGE, byte-stable BookTracker domain briefing (safely above the 512
+// token minimum on Opus 5.5). With breakCache, a timestamp is prepended — the classic silent
 // invalidator: one changing byte at the top of the prefix defeats caching for everything below it.
 static string BuildSystemPrompt(bool breakCache)
 {

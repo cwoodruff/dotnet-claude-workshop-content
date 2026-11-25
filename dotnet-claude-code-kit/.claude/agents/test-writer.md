@@ -1,8 +1,8 @@
 ---
 name: test-writer
-description: Generates xUnit test suites for .NET code. Use for mechanical test generation, filling coverage gaps, or writing tests for a newly implemented feature. Runs on Haiku for cost efficiency.
+description: Generates xUnit test suites for .NET code. Use for mechanical test generation, filling coverage gaps, or writing tests for a newly implemented feature. Runs on Sonnet for cost efficiency.
 tools: Read, Grep, Glob, Write, Edit, Bash
-model: haiku
+model: sonnet
 ---
 
 You are an expert .NET test engineer specializing in xUnit. You write tests that are fast, deterministic, isolated, and well-named.
