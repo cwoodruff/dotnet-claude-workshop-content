@@ -58,6 +58,45 @@ def files_under(root):
     return found
 
 
+def read_bytes(path):
+    with open(path, "rb") as fh:
+        return fh.read()
+
+
+def copy_one(src, dst, check):
+    """Copy one file (decks without notes). Return True when the public copy changed or would change."""
+    if src.endswith(".pptx"):
+        data = without_notes(src)
+        if os.path.exists(dst) and read_bytes(dst) == data:
+            return False
+        if not check:
+            os.makedirs(os.path.dirname(dst), exist_ok=True)
+            with open(dst, "wb") as fh:
+                fh.write(data)
+        return True
+    if os.path.exists(dst) and filecmp.cmp(src, dst, shallow=False):
+        return False
+    if not check:
+        os.makedirs(os.path.dirname(dst), exist_ok=True)
+        shutil.copy2(src, dst)
+    return True
+
+
+def sync_folder(src_root, dst_root, folder, check):
+    changes = []
+    src_files, dst_files = files_under(src_root), files_under(dst_root)
+    for rel in sorted(src_files):
+        dst = os.path.join(dst_root, rel)
+        existed = os.path.exists(dst)
+        if copy_one(os.path.join(src_root, rel), dst, check):
+            changes.append(("update" if existed else "add", f"{folder}/{rel}"))
+    for rel in sorted(dst_files - src_files):
+        changes.append(("delete", f"{folder}/{rel}"))
+        if not check:
+            os.remove(os.path.join(dst_root, rel))
+    return changes
+
+
 def main():
     args = [a for a in sys.argv[1:] if not a.startswith("--")]
     check = "--check" in sys.argv
@@ -70,32 +109,7 @@ def main():
 
     changes = []
     for folder in MIRRORED:
-        src_root, dst_root = os.path.join(private, folder), os.path.join(public, folder)
-        src_files, dst_files = files_under(src_root), files_under(dst_root)
-
-        for rel in sorted(src_files):
-            src, dst = os.path.join(src_root, rel), os.path.join(dst_root, rel)
-            if rel.endswith(".pptx"):
-                data = without_notes(src)
-                if os.path.exists(dst) and open(dst, "rb").read() == data:
-                    continue
-                changes.append(("update" if os.path.exists(dst) else "add", f"{folder}/{rel}"))
-                if not check:
-                    os.makedirs(os.path.dirname(dst), exist_ok=True)
-                    with open(dst, "wb") as fh:
-                        fh.write(data)
-            else:
-                if os.path.exists(dst) and filecmp.cmp(src, dst, shallow=False):
-                    continue
-                changes.append(("update" if os.path.exists(dst) else "add", f"{folder}/{rel}"))
-                if not check:
-                    os.makedirs(os.path.dirname(dst), exist_ok=True)
-                    shutil.copy2(src, dst)
-
-        for rel in sorted(dst_files - src_files):
-            changes.append(("delete", f"{folder}/{rel}"))
-            if not check:
-                os.remove(os.path.join(dst_root, rel))
+        changes += sync_folder(os.path.join(private, folder), os.path.join(public, folder), folder, check)
 
     for kind, path in changes:
         print(f"{kind:7} {path}")
