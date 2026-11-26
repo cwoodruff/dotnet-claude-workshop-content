@@ -32,10 +32,13 @@ jobs:
           # The workflow's own token, so no GitHub App install is needed for the comment.
           github_token: ${{ secrets.GITHUB_TOKEN }}
           # Sonnet 5.5 is the right tier for mechanical review work and keeps every PR cheap.
-          # The allowed tools let Claude read the PR and post its comment, nothing more.
+          # --allowedTools pre-approves reading the PR and posting the comment. --permission-mode
+          # default makes any other tool call that would need approval fail instead of running,
+          # which matters because the PR content Claude reads is untrusted.
           claude_args: |
             --model claude-sonnet-5-5
             --max-turns 10
+            --permission-mode default
             --allowedTools "Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr comment:*)"
           prompt: |
             Review pull request #${{ github.event.pull_request.number }} in ${{ github.repository }}
