@@ -111,6 +111,11 @@ def main():
     if not os.path.isdir(os.path.join(public, "src", "c0")):
         sys.exit(f"{public} does not look like dotnet-claude-workshop-content (no src/c0).")
 
+    # An empty or missing folder here would delete every public copy, so refuse instead.
+    empty = [f for f in MIRRORED if not tracked_files(private, f)]
+    if empty:
+        sys.exit(f"No tracked files under {', '.join(empty)} in {private}; refusing to sync.")
+
     changes = []
     for folder in MIRRORED:
         changes += sync_folder(private, public, folder, check)

@@ -48,10 +48,16 @@ export CONNECTIONSTRINGS__BOOKTRACKER="Data Source=$WORK/smoke.db"
 export ASPNETCORE_ENVIRONMENT=Development
 export DOTNET_NOLOGO=1
 
-wait_for() {
-  local url="$1" seconds="$2" i=0
+port_in_use() {
+  local url="$1"
+  curl -s -o /dev/null --max-time 3 "$url"
+}
+
+wait_for() { # succeeds once the url answers; fails early if the process exits
+  local url="$1" seconds="$2" pid="$3" i=0
   while [[ "$i" -lt "$seconds" ]]; do
-    curl -s -o /dev/null "$url" && return 0
+    kill -0 "$pid" 2>/dev/null || return 1
+    curl -s -o /dev/null --max-time 3 "$url" && return 0
     sleep 1; i=$((i + 1))
   done
   return 1
@@ -65,13 +71,21 @@ else
 fi
 
 # ---- 2. start the API ---------------------------------------------------------
+# Something already on the port would answer these checks with your own data and key, so stop.
+if port_in_use "$API_URL/"; then
+  fail "something is already listening on $API_URL; stop it and re-run"; cat "$RESULTS"; exit 1
+fi
 dotnet run --no-build --project "$APP_DIR/BookTracker.Api" --urls "$API_URL" > "$WORK/api.log" 2>&1 &
 API_PID=$!
-if wait_for "$API_URL/" 60; then pass "API starts on $API_URL"; else fail "API did not start (see $WORK/api.log)"; fi
+if wait_for "$API_URL/" 60 "$API_PID"; then
+  pass "API starts on $API_URL"
+else
+  fail "API did not start (see $WORK/api.log)"; cat "$RESULTS"; exit 1
+fi
 
 post() { # prints the HTTP status
   local path="$1" body="$2" out="$3"
-  curl -s -o "$out" -w '%{http_code}' -X POST "$API_URL$path" \
+  curl -s --max-time 180 -o "$out" -w '%{http_code}' -X POST "$API_URL$path" \
     -H 'Content-Type: application/json' -H 'X-User-Id: smoke' -d "$body"
 }
 
@@ -123,10 +137,14 @@ else
 fi
 
 # ---- 7. MCP server: initialize and list tools ------------------------------------
-if [[ -d "$APP_DIR/BookTracker.Mcp" ]]; then
+if [[ ! -d "$APP_DIR/BookTracker.Mcp" ]]; then
+  skip "MCP server (no BookTracker.Mcp in this lab folder)"
+elif port_in_use "$MCP_URL/"; then
+  fail "something is already listening on $MCP_URL; MCP check not run"
+else
   dotnet run --no-build --project "$APP_DIR/BookTracker.Mcp" --urls "$MCP_URL" > "$WORK/mcp.log" 2>&1 &
   MCP_PID=$!
-  wait_for "$MCP_URL/" 60
+  wait_for "$MCP_URL/" 60 "$MCP_PID" || fail "MCP server did not start (see $WORK/mcp.log)"
   mcp() {
     local body="$1"
     curl -s --max-time 30 -X POST "$MCP_URL/" -H 'Content-Type: application/json' \
@@ -141,8 +159,6 @@ if [[ -d "$APP_DIR/BookTracker.Mcp" ]]; then
     fail "MCP server did not answer initialize and tools/list (see $WORK/mcp.log)"
   fi
   echo "      to try it from Claude Code:  claude mcp add --transport http booktracker $MCP_URL/"
-else
-  skip "MCP server (no BookTracker.Mcp in this lab folder)"
 fi
 
 cleanup; API_PID=""; MCP_PID=""
