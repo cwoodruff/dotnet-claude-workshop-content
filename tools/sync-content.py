@@ -31,9 +31,9 @@ def without_notes(path):
     """Return the deck's bytes with every slide's speaker notes removed, written deterministically."""
     prs = Presentation(path)
     for slide in prs.slides:
-        for rid, rel in list(slide.part.rels.items()):
-            if rel.reltype == RT.NOTES_SLIDE:
-                slide.part.rels.pop(rid)
+        notes = [rid for rid, rel in slide.part.rels.items() if rel.reltype == RT.NOTES_SLIDE]
+        for rid in notes:
+            slide.part.rels.pop(rid)
     raw = io.BytesIO()
     prs.save(raw)
     # Rewrite the zip with fixed timestamps and order so the same deck always gives the same bytes.
