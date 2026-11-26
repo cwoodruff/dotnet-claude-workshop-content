@@ -4,17 +4,20 @@
     python3 tools/sync-content.py ../dotnet-claude-workshop-content           # copy
     python3 tools/sync-content.py ../dotnet-claude-workshop-content --check   # report only, exit 1 on drift
 
-The private repo wins. Mirrored folders are copied file for file, and files the private
-repo does not have are deleted from the public copy. Decks (.pptx) are copied with their
+The private repo wins. Only files git tracks in this repo are copied (ignored or untracked
+local files, such as a .env, never leave this machine), and tracked public files this repo
+does not have are deleted from the public copy. Decks (.pptx) are copied with their
 speaker notes removed. The lab folders (src/c0..src/c10) are not touched: the public repo
 is their source of truth.
 
 Needs python-pptx (pip install python-pptx).
 """
+import argparse
 import filecmp
 import io
 import os
 import shutil
+import subprocess
 import sys
 import zipfile
 
@@ -22,8 +25,6 @@ from pptx import Presentation
 from pptx.opc.constants import RELATIONSHIP_TYPE as RT
 
 MIRRORED = ["decks", "demos", "dotnet-claude-code-kit", "tools"]
-SKIP_DIRS = {"bin", "obj", ".vs", ".idea", "node_modules"}
-SKIP_FILES = {".DS_Store"}
 FIXED_TIME = (2026, 1, 1, 0, 0, 0)
 
 
@@ -46,16 +47,16 @@ def without_notes(path):
     return out.getvalue()
 
 
-def files_under(root):
-    found = set()
-    if not os.path.isdir(root):
-        return found
-    for here, dirs, files in os.walk(root):
-        dirs[:] = [d for d in dirs if d not in SKIP_DIRS]
-        for f in files:
-            if f not in SKIP_FILES:
-                found.add(os.path.relpath(os.path.join(here, f), root))
-    return found
+def tracked_files(repo, folder):
+    """Files git tracks under folder, relative to it. Tracked files deleted locally are left out."""
+    out = subprocess.run(["git", "-C", repo, "ls-files", "-z", "--", folder],
+                         check=True, capture_output=True).stdout.decode()
+    prefix = folder + "/"
+    return {f[len(prefix):] for f in out.split("\0") if f and os.path.isfile(os.path.join(repo, f))}
+
+
+def is_executable(path):
+    return bool(os.stat(path).st_mode & 0o111)
 
 
 def read_bytes(path):
@@ -74,7 +75,8 @@ def copy_one(src, dst, check):
             with open(dst, "wb") as fh:
                 fh.write(data)
         return True
-    if os.path.exists(dst) and filecmp.cmp(src, dst, shallow=False):
+    if (os.path.exists(dst) and filecmp.cmp(src, dst, shallow=False)
+            and is_executable(src) == is_executable(dst)):
         return False
     if not check:
         os.makedirs(os.path.dirname(dst), exist_ok=True)
@@ -82,9 +84,10 @@ def copy_one(src, dst, check):
     return True
 
 
-def sync_folder(src_root, dst_root, folder, check):
+def sync_folder(private, public, folder, check):
     changes = []
-    src_files, dst_files = files_under(src_root), files_under(dst_root)
+    src_root, dst_root = os.path.join(private, folder), os.path.join(public, folder)
+    src_files, dst_files = tracked_files(private, folder), tracked_files(public, folder)
     for rel in sorted(src_files):
         dst = os.path.join(dst_root, rel)
         existed = os.path.exists(dst)
@@ -98,18 +101,19 @@ def sync_folder(src_root, dst_root, folder, check):
 
 
 def main():
-    args = [a for a in sys.argv[1:] if not a.startswith("--")]
-    check = "--check" in sys.argv
-    if len(args) != 1:
-        sys.exit(__doc__)
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("public", help="path to a clone of dotnet-claude-workshop-content")
+    parser.add_argument("--check", action="store_true", help="report drift and exit 1; change nothing")
+    args = parser.parse_args()
+    check = args.check
     private = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    public = os.path.abspath(args[0])
+    public = os.path.abspath(args.public)
     if not os.path.isdir(os.path.join(public, "src", "c0")):
         sys.exit(f"{public} does not look like dotnet-claude-workshop-content (no src/c0).")
 
     changes = []
     for folder in MIRRORED:
-        changes += sync_folder(os.path.join(private, folder), os.path.join(public, folder), folder, check)
+        changes += sync_folder(private, public, folder, check)
 
     for kind, path in changes:
         print(f"{kind:7} {path}")
