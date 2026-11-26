@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **Deck** | `decks/Day 2/Day2-Section2-Streaming-Tools-Thinking.pptx` (slide 5, "See It Work") |
-| **Section** | Day 2 · Section 2 — Streaming, Tool Calling & Extended Thinking (Block 2A) |
+| **Section** | Day 2 · Section 2 — Streaming, Tool Calling, Thinking & Effort (Block 2A) |
 | **Duration** | ~8 min |
 | **Risk** | Medium (live API call; buffering proxies can spoil the effect) |
 | **Internet** | Yes — Anthropic API |

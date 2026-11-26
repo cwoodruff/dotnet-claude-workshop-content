@@ -1,0 +1,8 @@
+{
+  "name": "booktracker-kit",
+  "version": "0.1.0",
+  "description": "BookTracker steering kit: API and data-access rules, the add-api-endpoint skill, the test-writer subagent, and a destructive-command guardrail hook.",
+  "author": {
+    "name": "Chris Woodruff"
+  }
+}

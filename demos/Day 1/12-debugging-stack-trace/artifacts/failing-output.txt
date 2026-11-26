@@ -1,0 +1,17 @@
+# Captured from: dotnet test BookTracker.sln --filter "FullyQualifiedName~ReadingProgressTests" --nologo
+# in src/c4/BookTracker with the edit from introduce-bug.md applied. Paths are shortened to /path/to.
+
+Test run for /path/to/BookTracker/BookTracker.Tests/bin/Debug/net10.0/BookTracker.Tests.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+[xUnit.net 00:00:00.51]     BookTracker.Tests.ReadingProgressTests.Apply_CompletedToReading_Rejected [FAIL]
+  Failed BookTracker.Tests.ReadingProgressTests.Apply_CompletedToReading_Rejected [5 ms]
+  Error Message:
+   Assert.False() Failure
+Expected: False
+Actual:   True
+  Stack Trace:
+     at BookTracker.Tests.ReadingProgressTests.Apply_CompletedToReading_Rejected() in /path/to/BookTracker/BookTracker.Tests/ReadingProgressTests.cs:line 94
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+
+Failed!  - Failed:     1, Passed:     7, Skipped:     0, Total:     8, Duration: 81 ms - BookTracker.Tests.dll (net10.0)

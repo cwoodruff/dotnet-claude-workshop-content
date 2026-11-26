@@ -58,6 +58,8 @@ BenchmarkDotNet.Artifacts/
 project.lock.json
 project.fragment.lock.json
 artifacts/
+# Day 1 demo artifacts are workshop content, mirrored to the public repo.
+!/demos/Day 1/*/artifacts/
 
 # StyleCop
 StyleCopReport.xml

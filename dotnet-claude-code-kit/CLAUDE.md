@@ -43,7 +43,7 @@ Run `dotnet build` after any multi-file change and fix all warnings, not just er
 
 - Never concatenate user input into SQL. EF Core parameterization or `FromSqlInterpolated` only.
 - Never modify files under `Migrations/` directly (a hook blocks this — use `dotnet ef migrations add`).
-- Never commit secrets. Connection strings and API keys come from user-secrets, environment variables, or `appsettings.Development.json` (gitignored).
+- Never commit secrets. Connection strings and API keys go in user-secrets (`dotnet user-secrets set`) or environment variables, never in an `appsettings*.json` file: those are committed to git.
 - Don't add NuGet packages without stating why; prefer BCL solutions first.
 - Don't suppress warnings with pragmas; fix the cause.
 
