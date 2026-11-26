@@ -129,7 +129,7 @@
   `FlushAsync` per chunk is what turns "a response" into "a stream".
 - **The service/endpoint split matters:** `StreamingService` yields plain strings
   (`IAsyncEnumerable<string>`), so the same service could feed SSE, SignalR, or a console.
-  BookTracker's `StreamingService` (`src/BookTracker/BookTracker.Api/Services/StreamingService.cs`)
+  BookTracker's `StreamingService` (`src/c6/BookTracker/BookTracker.Api/Services/StreamingService.cs` in the content repo)
   has the identical shape behind an interface.
 - **Cancellation flows end-to-end:** the endpoint's `CancellationToken` fires when the client
   disconnects (Ctrl-C the curl) and stops the upstream Claude stream — you stop paying for

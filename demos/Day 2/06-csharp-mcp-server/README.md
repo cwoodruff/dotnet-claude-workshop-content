@@ -11,10 +11,10 @@
 
 This folder contains a **self-contained** MCP server in `src/` (`Demo6.McpServer`) so the demo
 needs no database, no checkpoint folder, and no other running process. It is modeled line-for-line
-on the real `src/BookTracker/BookTracker.Mcp` project (same packages, same registration pattern,
+on the real `src/c8/BookTracker/BookTracker.Mcp` project in the content repo (same packages, same registration pattern,
 same tool shape) but backs its tools with an in-memory catalog of 10 seeded books — five of which
 match "space," so the canonical demo prompt always returns hits. If you prefer to demo against the
-real SQLite-backed server, everything below works identically with `BookTracker.Mcp` — same port,
+real SQLite-backed server, everything below works identically with `src/c8/BookTracker/BookTracker.Mcp` — same port,
 same URL, same commands.
 
 ## What this demo teaches
