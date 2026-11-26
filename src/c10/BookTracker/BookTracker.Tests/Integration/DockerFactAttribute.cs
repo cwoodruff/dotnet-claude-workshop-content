@@ -53,11 +53,13 @@ public sealed class DockerFactAttribute : FactAttribute
 
         try
         {
+            // Bounded, so a wedged daemon can't hang test discovery.
+            using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(2));
             using var socket = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.Unspecified);
-            socket.Connect(new UnixDomainSocketEndPoint(path));
+            socket.ConnectAsync(new UnixDomainSocketEndPoint(path), timeout.Token).AsTask().GetAwaiter().GetResult();
             return true;
         }
-        catch (SocketException)
+        catch (Exception ex) when (ex is SocketException or OperationCanceledException)
         {
             return false;
         }
