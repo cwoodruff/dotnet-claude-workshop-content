@@ -1,3 +1,5 @@
+using System.Net.Sockets;
+
 namespace BookTracker.Tests.Integration;
 
 /// <summary>
@@ -37,6 +39,27 @@ public sealed class DockerFactAttribute : FactAttribute
             Path.Combine(home, ".colima/default/docker.sock"),
         ];
 
-        return sockets.Any(File.Exists);
+        return sockets.Any(CanConnect);
+    }
+
+    // A socket file alone isn't enough: Docker Desktop leaves it behind when it's stopped, and the
+    // test would then fail instead of skipping. Connecting proves something is listening.
+    private static bool CanConnect(string path)
+    {
+        if (!File.Exists(path))
+        {
+            return false;
+        }
+
+        try
+        {
+            using var socket = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.Unspecified);
+            socket.Connect(new UnixDomainSocketEndPoint(path));
+            return true;
+        }
+        catch (SocketException)
+        {
+            return false;
+        }
     }
 }
