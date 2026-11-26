@@ -6,7 +6,7 @@
 | **Scheduled** | 4:05 PM |
 | **Duration** | 17 min |
 | **Risk** | Medium (live multi-file implementation can drift — but recovery *is* the lesson) |
-| **Internet** | No |
+| **Internet** | Yes, for Claude Code's model connection (nothing else) |
 | **GitHub issue** | <https://github.com/cwoodruff/dotnet-claude-workshop/issues/15> |
 
 ## What this demo teaches
@@ -21,12 +21,19 @@ The full Day 1 acceleration loop in one sitting — every prior section pays off
 
 ## Prerequisites / setup
 
-- [ ] **Read the spec first:** `src/BookTracker/specs/reading-progress.md` — the 6-section worked example (context/scope, API contract, data model, business rules incl. the forward-only status state machine, tests required, prohibitions). The whole demo drives from this file; know its sections cold, especially §4 (rules) and §6 (prohibitions), because the pushback and drift-recovery moments lean on them.
-- [ ] Terminal running `claude` in `src/BookTracker`; `.claude/` config from Sections 1–2 loaded (CLAUDE.md, `api-endpoints`/`data-access` rules, PostToolUse build hook). A **fresh session** so the hook registration is live.
+- [ ] **Read the spec first:** `src/c4/BookTracker/specs/reading-progress.md` — the 6-section worked example (context/scope, API contract, data model, business rules incl. the forward-only status state machine, tests required, prohibitions). The whole demo drives from this file; know its sections cold, especially §4 (rules) and §6 (prohibitions), because the pushback and drift-recovery moments lean on them.
+- [ ] Terminal running `claude` in `src/c3/BookTracker`; `.claude/` config from Sections 1–2 loaded (CLAUDE.md, `api-endpoints`/`data-access` rules, PostToolUse build hook). A **fresh session** so the hook registration is live.
 - [ ] `dotnet build BookTracker.sln` and `dotnet test BookTracker.sln` green before you start; Demo 9b's staged bug reverted (`git status` clean).
-- [ ] **Starting-state decision (important):** this repo's `src/BookTracker` already contains the finished Reading Progress feature (`ReadingProgressRules`, `ReadingProgressService`, endpoints, tests). Two ways to run the demo — pick one in advance:
-  - **A. Build-it-live (matches the script below):** demo from a checkpoint/branch *without* the feature (the pre-Lab-4 state), so Claude genuinely implements from the spec. This is the full-fat version.
-  - **B. Spec-review + gap-fill (fallback, and fine on this repo as-is):** run the spec-review pass, then have Claude *verify* the existing implementation against the spec ("read the spec, read the implementation, report any rule it violates and any required test that's missing") and implement one missing slice. Less theater, same lessons.
+- [ ] **Starting state:** `src/c3/BookTracker` is the state before Lab 4: no Reading Progress feature and no `specs/` folder. Stage the spec from the finished checkpoint first:
+
+  ```bash
+  mkdir -p src/c3/BookTracker/specs
+  cp src/c4/BookTracker/specs/reading-progress.md src/c3/BookTracker/specs/
+  ```
+
+  `src/c4/BookTracker` is the finished feature to compare against afterward. Two ways to run the demo, pick one in advance:
+  - **A. Build-it-live (matches the script below):** run in `src/c3/BookTracker` with the spec staged, so Claude genuinely implements from the spec. This is the full-fat version.
+  - **B. Spec-review + gap-fill (fallback):** run in `src/c4/BookTracker` instead, run the spec-review pass, then have Claude *verify* the existing implementation against the spec ("read the spec, read the implementation, report any rule it violates and any required test that's missing") and implement one missing slice. Less theater, same lessons.
 - [ ] Rehearsed once end-to-end with a timer — 17 minutes is tight for a multi-file build; know which steps you'll cut (see Recovery).
 - [ ] Have `specs/reading-progress.md` open in a second pane/editor so you can point at the exact line during pushback.
 

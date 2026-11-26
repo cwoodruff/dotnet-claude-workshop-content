@@ -5,8 +5,8 @@
 | **Slide deck** | `decks/Day 1/Section4-AI-in-the-SDLC.pptx` (slide 7, "Debugging") |
 | **Scheduled** | 3:51 PM |
 | **Duration** | 6 min |
-| **Risk** | Low (fully offline) |
-| **Internet** | No |
+| **Risk** | Low (local files plus Claude Code's model connection) |
+| **Internet** | Yes, for Claude Code's model connection (nothing else) |
 | **GitHub issue** | <https://github.com/cwoodruff/dotnet-claude-workshop/issues/14> |
 
 ## What this demo teaches
@@ -23,11 +23,11 @@ Bonus callout: the `PostToolUse` build/test hook from Section 2 surfaces failure
 
 ## Prerequisites / setup
 
-- [ ] Terminal running `claude` in `src/BookTracker`; `.claude/` config (including the PostToolUse build hook) loaded.
-- [ ] **Stage the deliberate bug** — the exact before/after edit is in [`artifacts/introduce-bug.md`](artifacts/introduce-bug.md). It adds a plausible-looking "allow re-reading" case to the status state machine in `src/BookTracker/BookTracker.Core/Domain/ReadingProgressRules.cs`, which breaks the spec rule that `Completed` is terminal. Apply it **before the session** (it's on the night-before checklist), on a scratch branch:
+- [ ] Terminal running `claude` in `src/c4/BookTracker`; `.claude/` config (including the PostToolUse build hook) loaded.
+- [ ] **Stage the deliberate bug** — the exact before/after edit is in [`artifacts/introduce-bug.md`](artifacts/introduce-bug.md). It adds a plausible-looking "allow re-reading" case to the status state machine in `src/c4/BookTracker/BookTracker.Core/Domain/ReadingProgressRules.cs`, which breaks the spec rule that `Completed` is terminal. Apply it **before the session** (it's on the night-before checklist), on a scratch branch:
 
   ```bash
-  cd src/BookTracker
+  cd src/c4/BookTracker
   git switch -c demo/9b-staged-bug
   # apply the edit from artifacts/introduce-bug.md, then:
   dotnet build BookTracker.sln        # must still compile — the bug is logical, not syntactic
@@ -39,7 +39,7 @@ Bonus callout: the `PostToolUse` build/test hook from Section 2 surfaces failure
 - [ ] Verify the diff is small (`git diff` shows one file, ~5 added lines) so the "find it" step is fair at demo speed.
 - [ ] Know the fix cold: revert the added case so `Completed → anything` falls through to the `default:` rejection.
 
-> **Note on the demo timeline:** this repo's `src/BookTracker` already contains the finished Reading Progress feature (which Demo 10 / Lab 4 builds). For this 6-minute demo that's fine — you're debugging the *rules* class and its tests, which exist. If you run Section 4 demos strictly in order from a starter checkpoint without the feature, run Demo 9b *after* Demo 10's implementation instead, exactly as Lab 4 Part C does.
+> **Note on the demo timeline:** `src/c4/BookTracker` is the state after Lab 4, so it already has the Reading Progress feature that Demo 10 builds. For this 6-minute demo that's fine: you're debugging the *rules* class and its tests, which exist there. If you run Section 4 demos strictly in order, run Demo 9b *after* Demo 10's implementation instead, exactly as Lab 4 Part C does.
 
 ## Step-by-step script
 
@@ -70,7 +70,7 @@ Bonus callout: the `PostToolUse` build/test hook from Section 2 surfaces failure
 
 ## Recovery
 
-- No network dependency — nothing external can fail.
+- **Claude Code loses its connection:** nothing here runs without it. Switch to your hotspot; if that fails too, walk the steps from the slides and the expected-output notes below.
 - **The fix comes too fast** (Claude one-shots root cause + fix in a single reply): don't fight it — slow it down and surface the discipline explicitly. "It skipped a step I care about — Claude, before applying that, show me the failing test that reproduces the bug, run it, and *then* fix." The reproduce-before-fix step is the actual lesson.
 - **Claude fixes the test instead of the source** (rare, but the perfect teachable failure): stop, highlight it — "that's the anti-pattern from the slide, live" — and reply: "The test encodes the spec (`specs/reading-progress.md` says Completed is terminal). Fix the source." Let it self-correct on camera.
 - **Claude can't find the bug** (didn't read the rules file): steer with grounding, not the answer: "Read BookTracker.Core/Domain/ReadingProgressRules.cs and compare the transition switch against section 4 of specs/reading-progress.md."

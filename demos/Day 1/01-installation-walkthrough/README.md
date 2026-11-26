@@ -6,7 +6,7 @@
 | **Scheduled** | 9:25 AM |
 | **Duration** | 20 min |
 | **Risk** | Medium (live install — network + machine variance) |
-| **Internet** | Yes, for the install/auth only; nothing else in Section 1 needs it |
+| **Internet** | Yes: the install and sign-in, and Claude Code's model connection for the rest of the day |
 | **GitHub issue** | <https://github.com/cwoodruff/dotnet-claude-workshop/issues/3> |
 
 ## What this demo teaches
@@ -80,7 +80,7 @@ Stage all of this **before doors open** (it is on the night-before checklist):
 - **Old Node version** (the most common failure): `npm install -g` errors or `claude` crashes at startup. Fix is `node --version` → upgrade to 18+ (nvm: `nvm install --lts && nvm use --lts`) → reinstall. Hand to the TA if it's an attendee machine.
 - **Windows attendee in PowerShell/CMD:** the fix is not troubleshooting PowerShell — it's moving them into the WSL2 Ubuntu terminal and reinstalling there. If WSL2 itself isn't installed, that's a 10+ minute detour: TA pairs with them through Lab 1 Part A while the room moves on.
 - **OAuth browser hop fails / wrong account:** sign out of Claude.ai in the browser, re-run `claude`, sign in with the paid account. If the room's network blocks the callback, use the API-key path as a visible fallback (`export ANTHROPIC_API_KEY=...` from a key you have staged — never show the key on screen).
-- **Conference Wi-Fi dies mid-install:** switch to your phone hotspot for the install step only; everything after this demo in Section 1 is offline.
+- **Conference Wi-Fi dies mid-install:** switch to your phone hotspot. Keep it handy: every later demo still needs Claude Code's model connection, even when it only reads local files.
 
 ## Teaching callouts
 

@@ -6,7 +6,7 @@
 | **Scheduled** | 10:48 AM (Section 2, right after the steering-model slides) |
 | **Duration** | 5 min |
 | **Risk** | Low (purely conceptual — no live tooling) |
-| **Internet** | Not required |
+| **Internet** | No (slides and a quiz; no Claude Code session) |
 | **GitHub issue** | https://github.com/cwoodruff/dotnet-claude-workshop/issues/6 |
 
 ## What this demo teaches
@@ -33,7 +33,7 @@
 - [ ] The Section 2 deck (`decks/Day 1/Section2-Steering-Claude-Code.pptx`) on the steering-table
       slide, so you can flip between deck and card.
 - [ ] No `.claude/` staging, no terminal, no build required. This demo has **no artifacts folder**.
-- [ ] Optional: have `src/BookTracker/.claude/` visible in your editor's file tree, so you can
+- [ ] Optional: have `src/c2/BookTracker/.claude/` (the finished Lab 2 config) visible in your editor's file tree, so you can
       point at real homes (rules, skills, agents, hooks) as you name them — they are the exact
       files the next four demos use.
 

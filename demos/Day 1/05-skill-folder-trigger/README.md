@@ -6,7 +6,7 @@
 | **Scheduled** | 11:18 AM (Section 2, Block 2B — after the "skills are folders" slides) |
 | **Duration** | 8 min |
 | **Risk** | Low |
-| **Internet** | Not required |
+| **Internet** | Yes, for Claude Code's model connection (nothing else) |
 | **GitHub issue** | https://github.com/cwoodruff/dotnet-claude-workshop/issues/7 |
 
 ## What this demo teaches
@@ -26,22 +26,23 @@
       stages/refreshes the `add-api-endpoint` skill folder:
 
       ```bash
-      cp -R "demos/Day 1/05-skill-folder-trigger/artifacts/.claude/." "src/BookTracker/.claude/"
+      cp -R "demos/Day 1/05-skill-folder-trigger/artifacts/.claude/." "src/c1/BookTracker/.claude/"
       ```
 
-      Note: `src/BookTracker/.claude/` already ships a staged copy of this skill; the copy above
-      overwrites it with this demo's version (which routes its references through
-      `references/gotchas.md`). That is intended.
+      Section 2 demos run in `src/c1/BookTracker` (the state after Lab 1, which has `CLAUDE.md` and no
+      `.claude/` yet). Lab 2 ends at `src/c2`, whose `.claude/` holds the attendee version of
+      this skill (with `references/endpoint-pattern.md`); this demo's version routes its
+      references through `references/gotchas.md`.
 - [ ] Verify the folder layout is what you'll show on screen:
 
       ```bash
-      find "src/BookTracker/.claude/skills/add-api-endpoint" -type f
+      find "src/c1/BookTracker/.claude/skills/add-api-endpoint" -type f
       ```
 
       Expected: `SKILL.md` and `references/gotchas.md`.
-- [ ] **Remove any stale single-file skills** under `src/BookTracker/.claude/skills/` (a bare
+- [ ] **Remove any stale single-file skills** under `src/c1/BookTracker/.claude/skills/` (a bare
       `*.md` directly in `skills/`) — the folder-not-file point is the demo.
-- [ ] `claude` running from `src/BookTracker/`. Skills are discovered per-message, so a fresh
+- [ ] `claude` running from `src/c1/BookTracker/`. Skills are discovered per-message, so a fresh
       session is not strictly required, but starting one keeps `/context` clean for narration.
 - [ ] `dotnet build BookTracker.sln --nologo` passes before you start (the skill ends with a build).
 
@@ -73,11 +74,8 @@
    Add a GET /api/authors/{id}/books endpoint returning the author's books sorted by publication year.
    ```
 
-   (This route does not exist in `src/BookTracker` — `AuthorEndpoints.cs` has CRUD only. If you
-   are demoing from the `c0` starter checkpoint instead, use the facilitator script's original
-   prompt: `Add a GET /books/{id}/reviews endpoint returning reviews sorted by date.` In
-   `src/BookTracker` the reviews route already exists in `ReviewsEndpoints.cs`, so don't use it
-   here.)
+   (This route does not exist in c1: `AuthorEndpoints.cs` has CRUD only. Don't use the old
+   `GET /books/{id}/reviews` prompt here; c1 has no Reviews feature yet, it arrives in c2.)
 
 5. **Narrate the match.** Expected output: Claude announces it is using the `add-api-endpoint`
    skill (a skill-invocation line appears), then follows the procedure — reads
@@ -101,8 +99,8 @@
   `description` to include the words you used ("add an endpoint", "create a GET"), send the prompt
   again in a new message. Descriptions are re-evaluated per message.
 - **Skill not found at all:** check the copy landed at
-  `src/BookTracker/.claude/skills/add-api-endpoint/SKILL.md` and that you launched `claude` from
-  `src/BookTracker/` (project-level `.claude/` is relative to the working directory).
+  `src/c1/BookTracker/.claude/skills/add-api-endpoint/SKILL.md` and that you launched `claude` from
+  `src/c1/BookTracker/` (project-level `.claude/` is relative to the working directory).
 - **The implementation runs long:** you don't need it to finish. Once the skill has visibly
   triggered and Claude is reading `gotchas.md`, the point is made — press Escape, and move to the
   callouts.

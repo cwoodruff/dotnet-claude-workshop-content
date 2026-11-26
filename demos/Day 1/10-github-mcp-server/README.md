@@ -34,8 +34,8 @@ Do all of this **before the session** (PAT creation is the slow step — it is o
 - [ ] Verify the night before **and** at the lunch break: `claude mcp list` shows `github - connected`.
 - [ ] **Recorded backup ready** — this is the one High-risk demo of the day. Have a screen recording of the full sequence (register → list issues → propose fix → create issue → permission prompt) queued in a player, tested on the projector. Do not skip this; conference Wi-Fi fails at 2:30 PM, not at 8 AM.
 - [ ] The demo repo has a few **real open issues** so the "list issues" prompt returns something interesting. Seed 2–3 small issues the night before if the tracker is empty (e.g. "Add pagination to GET /api/books", "Search endpoint is injection-prone").
-- [ ] Terminal running `claude` from `src/BookTracker` (repo root of the sample app), large font.
-- [ ] Read `artifacts/offline-fallback.md` in this folder once so the fallback is muscle memory, and confirm `src/BookTracker/proposed-issues/` exists (it ships in the repo).
+- [ ] Terminal running `claude` from `src/c2/BookTracker` (the state before Lab 3), large font.
+- [ ] Read `artifacts/offline-fallback.md` in this folder once so the fallback is muscle memory, The finished fallback issue is `src/c3/BookTracker/proposed-issues/reading-progress.md`; c2 has no `proposed-issues/` folder, so Claude creates it if you use the fallback.
 
 > **Security note:** the token goes into the `claude mcp add` command line. Type it off-screen or paste from a manager with the terminal briefly hidden; never leave it visible on the projector, and revoke the demo PAT after the workshop.
 
@@ -99,7 +99,7 @@ This is the High-risk demo. Decide fast — no failure mode here is worth more t
 - **`claude mcp list` shows disconnected / auth error:** almost always the token — wrong scopes, expired, or pasted incomplete. One retry: re-run `claude mcp add` with the staged backup token (keep a second PAT ready). If that fails, go offline (below).
 - **GitHub or the MCP endpoint is down, or Wi-Fi dies:** switch immediately to the **offline fallback** — full script in [`artifacts/offline-fallback.md`](artifacts/offline-fallback.md). Summary:
   1. **Query half:** have Claude answer "what's a good first contribution?" from local ground truth — `git log --oneline -20` plus the repo files — instead of the issue tracker.
-  2. **Action half:** have Claude **write the proposed issue to a local file** at `proposed-issues/reading-progress.md` with the same title, acceptance criteria, affected files, and complexity estimate. Same structured output, zero network, and the file already ships in `src/BookTracker/proposed-issues/` as the reference.
+  2. **Action half:** have Claude **write the proposed issue to a local file** at `proposed-issues/reading-progress.md` with the same title, acceptance criteria, affected files, and complexity estimate. Same structured output, no GitHub or MCP needed (Claude Code still needs its model connection), and `src/c3/BookTracker/proposed-issues/reading-progress.md` is the reference.
   3. Narrate explicitly: "Same query → action pattern; the transport is the only thing that changed."
 - **Everything is down (no MCP, flaky Claude connection):** play the **recorded backup** and narrate over it. This preserves the timeline for Lab 3 — attendees on working networks can still do the live version themselves.
 - **Slow responses eat the clock:** cut step 5 (the propose-a-fix prompt) — steps 4 and 6 alone carry the teaching (query, then gated action).

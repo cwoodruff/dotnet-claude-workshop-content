@@ -6,7 +6,7 @@
 | **Scheduled** | 9:45 AM |
 | **Duration** | 10 min |
 | **Risk** | Low |
-| **Internet** | No |
+| **Internet** | Yes, for Claude Code's model connection (nothing else) |
 | **GitHub issue** | <https://github.com/cwoodruff/dotnet-claude-workshop/issues/4> |
 
 ## What this demo teaches
@@ -18,22 +18,15 @@
 
 ## Prerequisites / setup
 
-- [ ] BookTracker cloned; terminal `cd`'d into the solution folder: `src/BookTracker` (quote the path if your shell needs it — the repo root path may contain spaces).
+- [ ] Workshop content repo cloned; terminal `cd`'d into the starter checkpoint: `src/c0/BookTracker` (quote the path if your shell needs it — the repo root path may contain spaces). Lab 1 ends at `src/c1`, so `c1/BookTracker/CLAUDE.md` is the finished version to compare against.
 - [ ] `dotnet build BookTracker.sln` succeeds from that folder (night-before checklist).
-- [ ] **Important:** the shipped `src/BookTracker/CLAUDE.md` already exists. For the demo to show `/init` generating fresh, move it aside beforehand and restore it after:
-
-  ```bash
-  cd "src/BookTracker"
-  mv CLAUDE.md CLAUDE.md.shipped
-  ```
-
-  (Restore after the demo with `mv CLAUDE.md.shipped CLAUDE.md`, or keep your trimmed demo version if you prefer — but restore before Section 2, whose demos assume the staged config.) Alternative low-risk play: skip the `mv`, run `/init` anyway, and teach from how it proposes updating the existing file — but the fresh-scaffold version lands the "map, not junk drawer" point harder.
+- [ ] `src/c0/BookTracker` has no `CLAUDE.md`, so `/init` scaffolds a fresh one. Keep the trimmed file for Demo 3. To reset the checkpoint after Section 1, run `git restore . && git clean -fd` from `src/c0/BookTracker`.
 - [ ] `claude` authenticated (Demo 1 just proved it).
 - [ ] An editor you can flip to for the trimming step (or plan to have Claude do the trimming in-session — script below covers both).
 
 ## Step-by-step script
 
-1. **Start the session.** From `src/BookTracker`:
+1. **Start the session.** From `src/c0/BookTracker`:
 
    ```bash
    claude

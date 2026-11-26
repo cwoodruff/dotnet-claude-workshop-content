@@ -6,7 +6,7 @@
 | **Scheduled** | 11:38 AM (Section 2, Block 2B — after the skills demo D4) |
 | **Duration** | 7 min |
 | **Risk** | Low |
-| **Internet** | Not required |
+| **Internet** | Yes, for Claude Code's model connection (nothing else) |
 | **GitHub issue** | https://github.com/cwoodruff/dotnet-claude-workshop/issues/8 |
 
 ## What this demo teaches
@@ -23,22 +23,21 @@
 - [ ] Copy this demo's artifacts into the BookTracker solution (run from the repo root):
 
       ```bash
-      cp -R "demos/Day 1/06-rules-path-scoped/artifacts/.claude/." "src/BookTracker/.claude/"
+      cp -R "demos/Day 1/06-rules-path-scoped/artifacts/.claude/." "src/c1/BookTracker/.claude/"
       ```
 
       This stages/refreshes two rules:
       - `.claude/rules/api-endpoints.md` — `paths: BookTracker.Api/Endpoints/**`
       - `.claude/rules/data-access.md` — `paths: BookTracker.Data/**`
 
-      Note: `src/BookTracker/.claude/rules/` already ships staged copies; the copy overwrites
-      them with this demo's versions. That is intended.
+      Lab 2's finished versions of these rules are in `src/c2/BookTracker/.claude/rules/`.
 - [ ] Verify the globs survived the copy:
 
       ```bash
-      head -4 "src/BookTracker/.claude/rules/api-endpoints.md" "src/BookTracker/.claude/rules/data-access.md"
+      head -4 "src/c1/BookTracker/.claude/rules/api-endpoints.md" "src/c1/BookTracker/.claude/rules/data-access.md"
       ```
 
-- [ ] Start a **fresh `claude` session from `src/BookTracker/`** so the rule set is picked up
+- [ ] Start a **fresh `claude` session from `src/c1/BookTracker/`** so the rule set is picked up
       cleanly and `/memory` output isn't cluttered by the previous demo.
 - [ ] Know your three exhibit files: `BookTracker.Api/Endpoints/BookEndpoints.cs` (matches
       api-endpoints), `BookTracker.Core/Services/BookService.cs` (matches neither), and
@@ -104,8 +103,8 @@
 
 - **Rule doesn't fire on the matching file:** check, in order —
   1. The glob: `head -4 .claude/rules/api-endpoints.md` — it must be
-     `BookTracker.Api/Endpoints/**` relative to the working directory (`src/BookTracker/`).
-  2. You launched `claude` from `src/BookTracker/`, not the repo root (globs are relative to
+     `BookTracker.Api/Endpoints/**` relative to the working directory (`src/c1/BookTracker/`).
+  2. You launched `claude` from `src/c1/BookTracker/`, not the repo root (globs are relative to
      the project root Claude Code detected).
   3. It's a **project-level** rule, not one under `~/.claude/rules/` — user-level `paths:` is
      the known-unreliable case; say so, it's literally the teaching point.

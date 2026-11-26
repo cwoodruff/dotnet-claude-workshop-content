@@ -6,7 +6,7 @@
 | **Scheduled** | 10:00 AM |
 | **Duration** | 20 min |
 | **Risk** | Low |
-| **Internet** | No |
+| **Internet** | Yes, for Claude Code's model connection (nothing else) |
 | **GitHub issue** | <https://github.com/cwoodruff/dotnet-claude-workshop/issues/5> |
 
 ## What this demo teaches
@@ -18,16 +18,16 @@
 
 ## Prerequisites / setup
 
-- [ ] Same terminal, same working directory as Demo 2: `src/BookTracker` (quote paths — the repo path may contain spaces).
+- [ ] Same terminal, same working directory as Demo 2: `src/c0/BookTracker` (quote paths — the repo path may contain spaces).
 - [ ] `claude` session open (continue the Demo 2 session, or start fresh — a fresh start bonus-demos CLAUDE.md loading at startup).
 - [ ] The trimmed/restored `CLAUDE.md` from Demo 2 is in place.
 - [ ] You have personally skimmed these files the night before, so you can verify claims instantly on screen:
-  - `BookTracker.Api/Program.cs` (DI wiring, endpoint mapping: `MapBookEndpoints`, `MapAuthorEndpoints`, `MapReviewsEndpoints`, `MapReadingProgressEndpoints`, plus the Day 2 chat/agent/recommend groups)
+  - `BookTracker.Api/Program.cs` (DI wiring, endpoint mapping: `MapBookEndpoints` and `MapAuthorEndpoints`; Reviews arrives in c2, Reading Progress in c4, the Day 2 AI endpoints from c5)
   - `BookTracker.Api/Endpoints/BookEndpoints.cs`
-  - `BookTracker.Core/Entities/` (`Book`, `Author`, `Review`, `ReadingProgress`, `ReadingStatus`)
+  - `BookTracker.Core/Entities/` (`Book`, `Author`)
   - `BookTracker.Core/Services/BookService.cs` and `BookTracker.Core/Interfaces/IBookRepository.cs`
   - `BookTracker.Data/BookTrackerDbContext.cs`, `BookTracker.Data/Repositories/BookRepository.cs`
-  - `BookTracker.Tests/` (`BookServiceTests.cs`, `ReviewServiceTests.cs`, `ReadingProgressTests.cs`)
+  - `BookTracker.Tests/` (`BookServiceTests.cs` only, intentionally thin)
 - [ ] Know your ace: `BookTracker.Data/Repositories/BookRepository.cs`, `SearchByTitleAsync` — it builds SQL by string interpolation into `FromSqlRaw` (`$"SELECT * FROM Books WHERE Title LIKE '%{term}%'"`). It's the staged SQL-injection teaching gap and your guaranteed "verify this claim" anchor if the quality/gap prompts surface it — or your counter-example if Claude's assessment is too rosy.
 - [ ] A second terminal or editor pane ready to open cited files side-by-side for verification.
 
@@ -79,7 +79,7 @@
 
 ## Recovery
 
-- **Nothing should fail — this demo is fully offline** against local files with an already-authenticated session. The risks are pacing and a too-good answer.
+- **Little should fail:** it reads local files with an already-authenticated session, and the only outside dependency is Claude Code's model connection (hotspot if the Wi-Fi drops). The risks are pacing and a too-good answer.
 - **Claude is too fast to narrate:** slow down and read its file reads aloud after the fact — scroll back through the tool calls and reconstruct the grounding trail ("look at what it chose to read, and in what order").
 - **The answer is perfect and you can't find an inaccuracy:** use the flip from step 5 — demand exact file/line citations on a specific claim and verify one, or assert a plausible falsehood yourself and disprove it. The lesson is the *verification habit*, not Claude being wrong.
 - **The answer is badly wrong or goes sideways:** even better — verify, correct it in-session ("Actually, read BookTracker.Data/Repositories/BookRepository.cs and reconsider"), and show the grounded second answer improving. Failure-and-correction is the strongest version of this demo.

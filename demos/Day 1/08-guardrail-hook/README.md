@@ -6,7 +6,7 @@
 | **Scheduled** | 12:08 PM (Section 2, Block 2C — after the hooks slides) |
 | **Duration** | 8 min |
 | **Risk** | Low |
-| **Internet** | Not required |
+| **Internet** | Yes, for Claude Code's model connection (nothing else) |
 | **GitHub issue** | https://github.com/cwoodruff/dotnet-claude-workshop/issues/10 |
 
 ## What this demo teaches
@@ -27,36 +27,35 @@
 - [ ] Copy this demo's artifacts into the BookTracker solution (run from the repo root):
 
       ```bash
-      cp -R "demos/Day 1/08-guardrail-hook/artifacts/.claude/." "src/BookTracker/.claude/"
+      cp -R "demos/Day 1/08-guardrail-hook/artifacts/.claude/." "src/c1/BookTracker/.claude/"
       ```
 
       This stages/refreshes `.claude/hooks/block-destructive.sh` and `.claude/settings.json`.
-      **Warning:** the copy overwrites `src/BookTracker/.claude/settings.json` (the shipped one
-      registers the same two hooks; this demo's version adds a build timeout and a stricter
-      pattern list). That is intended for this demo.
+      Lab 2's attendee `settings.json` (in `src/c2/BookTracker/.claude/`) registers the same two
+      hooks; this demo's version adds a build timeout and a stricter pattern list.
 - [ ] **Make the hook executable** (`cp` normally preserves the bit, but verify — a missing +x is
       the #1 way this demo dies):
 
       ```bash
-      chmod +x "src/BookTracker/.claude/hooks/block-destructive.sh"
+      chmod +x "src/c1/BookTracker/.claude/hooks/block-destructive.sh"
       ```
 
 - [ ] **Smoke-test the hook standalone** — it reads the tool-call JSON from stdin:
 
       ```bash
-      echo '{"tool_input":{"command":"rm -rf bin"}}' | "src/BookTracker/.claude/hooks/block-destructive.sh"; echo "exit=$?"
+      echo '{"tool_input":{"command":"rm -rf bin"}}' | "src/c1/BookTracker/.claude/hooks/block-destructive.sh"; echo "exit=$?"
       ```
 
       Expected: `Blocked by guardrail: recursive force delete ('rm -rf') is not allowed...` and
       `exit=2`. Also check the allow path:
 
       ```bash
-      echo '{"tool_input":{"command":"dotnet build"}}' | "src/BookTracker/.claude/hooks/block-destructive.sh"; echo "exit=$?"
+      echo '{"tool_input":{"command":"dotnet build"}}' | "src/c1/BookTracker/.claude/hooks/block-destructive.sh"; echo "exit=$?"
       ```
 
       Expected: no output, `exit=0`.
 - [ ] `jq` installed (`which jq`) — the hook uses it to parse the tool JSON.
-- [ ] **Start a FRESH `claude` session from `src/BookTracker/` AFTER copying** — hooks in
+- [ ] **Start a FRESH `claude` session from `src/c1/BookTracker/` AFTER copying** — hooks in
       `settings.json` load at session start. A session that was already running will not see them.
       This is non-negotiable and is also the demo's own recovery lesson.
 - [ ] `dotnet build BookTracker.sln --nologo` passes (so the PostToolUse hook demo shows a clean
@@ -123,7 +122,7 @@
      part of the lesson.
   2. **Missing execute bit** — `chmod +x .claude/hooks/block-destructive.sh`, restart, retry.
   Also worth a glance: `which jq` (the script needs it) and that you launched from
-  `src/BookTracker/`.
+  `src/c1/BookTracker/`.
 - **Hook blocks but no reason shows:** the reason goes to stderr — scroll the tool result in the
   transcript; the standalone smoke test from setup proves the script side in five seconds.
 - **PostToolUse build is slow or fails on pre-existing errors:** the hook has a 120s timeout; if

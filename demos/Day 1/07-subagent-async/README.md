@@ -6,7 +6,7 @@
 | **Scheduled** | 11:52 AM (Section 2, Block 2C — after the subagent slides) |
 | **Duration** | 12 min |
 | **Risk** | Medium (async notify timing is out of your control — have the screenshot fallback ready) |
-| **Internet** | Not required |
+| **Internet** | Yes, for Claude Code's model connection (nothing else) |
 | **GitHub issue** | https://github.com/cwoodruff/dotnet-claude-workshop/issues/9 |
 
 ## What this demo teaches
@@ -28,20 +28,20 @@
 - [ ] Copy this demo's artifacts into the BookTracker solution (run from the repo root):
 
       ```bash
-      cp -R "demos/Day 1/07-subagent-async/artifacts/.claude/." "src/BookTracker/.claude/"
+      cp -R "demos/Day 1/07-subagent-async/artifacts/.claude/." "src/c1/BookTracker/.claude/"
       ```
 
       This stages/refreshes `.claude/agents/test-writer.md` (runs on Sonnet 5.5).
-      Note: `src/BookTracker/.claude/agents/` ships a shorter staged copy; the copy overwrites it
-      with this demo's fuller version. That is intended.
+      `src/c2/BookTracker/.claude/agents/` has the shorter attendee version from Lab 2; this
+      demo's copy is the fuller one.
 - [ ] **Remove any stale `.claude/agents/*.yaml`** — subagents are markdown; a leftover YAML
       undermines the correction you're teaching:
 
       ```bash
-      ls "src/BookTracker/.claude/agents/"
+      ls "src/c1/BookTracker/.claude/agents/"
       ```
 
-- [ ] `claude` running from `src/BookTracker/`; `dotnet build BookTracker.sln --nologo` and
+- [ ] `claude` running from `src/c1/BookTracker/`; `dotnet build BookTracker.sln --nologo` and
       `dotnet test BookTracker.sln --nologo` both pass beforehand (the subagent will run tests).
 - [ ] **Fallback screenshot ready:** a saved screenshot of a returned test-writer summary, in case
       the async notification is slow on stage (this is the Medium-risk item).
@@ -112,8 +112,8 @@
 - **Claude runs the task in-thread instead of spawning the agent:** be explicit — re-prompt with
   "Spawn the `test-writer` subagent as a background task for this." If it still won't, name the
   fix: the agent's `description` is the delegation trigger; sharpen it live (same lesson as D4).
-- **Agent not found:** verify `src/BookTracker/.claude/agents/test-writer.md` exists and you
-  launched `claude` from `src/BookTracker/`.
+- **Agent not found:** verify `src/c1/BookTracker/.claude/agents/test-writer.md` exists and you
+  launched `claude` from `src/c1/BookTracker/`.
 - **Generated tests fail to build:** fine — the subagent's workflow iterates with
   `dotnet test --filter` until green; if it returned red anyway, say "summaries can lie — verify"
   and segue: deterministic verification is exactly what the next demo's hooks are for.

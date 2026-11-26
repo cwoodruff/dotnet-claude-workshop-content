@@ -27,8 +27,12 @@ Each demo is tracked as a GitHub issue under its day's milestone:
 | `12-debugging-stack-trace` | Demo 9b: Debugging from a Stack Trace | Section4-AI-in-the-SDLC.pptx | [#14](https://github.com/cwoodruff/dotnet-claude-workshop/issues/14) |
 | `13-full-feature-from-spec` | Demo 10: Full Feature from Spec | Section4-AI-in-the-SDLC.pptx | [#15](https://github.com/cwoodruff/dotnet-claude-workshop/issues/15) |
 
-Day 1 demos run Claude Code against the existing `src/BookTracker` solution — no separate demo
-code. The `artifacts/` folders hold the `.claude/` files (skill, rules, subagent, hook,
+Day 1 demos run Claude Code against the BookTracker lab checkpoints in the public
+[workshop content repo](https://github.com/cwoodruff/dotnet-claude-workshop-content) (`src/c0` to
+`src/c4`), no separate demo code. Each demo's setup names its checkpoint: Section 1 runs in `c0`,
+Section 2 in `c1`, the MCP demo in `c2`, domain modeling and the full feature build in `c3` (with the
+spec staged from `c4`), and the debugging demo in `c4`. Reset a checkpoint afterward with
+`git restore . && git clean -fd` from its folder. The `artifacts/` folders hold the `.claude/` files (skill, rules, subagent, hook,
 settings, plugin manifest) each demo stages, plus the offline fallback, ADR template, and the
 staged bug + failing output for the debugging demo.
 

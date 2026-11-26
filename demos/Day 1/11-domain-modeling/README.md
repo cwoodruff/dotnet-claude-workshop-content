@@ -5,8 +5,8 @@
 | **Slide deck** | `decks/Day 1/Section4-AI-in-the-SDLC.pptx` (slide 11, "Live Demo," part 1) |
 | **Scheduled** | 3:45 PM |
 | **Duration** | 6 min |
-| **Risk** | Low (fully offline) |
-| **Internet** | No |
+| **Risk** | Low (local files plus Claude Code's model connection) |
+| **Internet** | Yes, for Claude Code's model connection (nothing else) |
 | **GitHub issue** | <https://github.com/cwoodruff/dotnet-claude-workshop/issues/13> |
 
 ## What this demo teaches
@@ -18,11 +18,11 @@
 
 ## Prerequisites / setup
 
-- [ ] Terminal running `claude` in `src/BookTracker`, with the `.claude/` config (CLAUDE.md, rules) in place from earlier sections — the recommendation should respect the house architecture (`Core ← Data ← Api`).
+- [ ] Terminal running `claude` in `src/c3/BookTracker`, with the `.claude/` config (CLAUDE.md, rules) in place from earlier sections — the recommendation should respect the house architecture (`Core ← Data ← Api`).
 - [ ] `dotnet build BookTracker.sln` is green (so Claude's file reads reflect a working tree).
 - [ ] The constraint you'll state chosen in advance. Default: **"BookTracker must serve 10,000 concurrent readers on one small VM (2 vCPU / 4 GB), SQLite stays."** Have a backup constraint in your notes (e.g. "the team is two developers and the hosting budget is $20/month") in case an attendee asks for a rerun with different pressure.
 - [ ] The MADR template staged: [`artifacts/adr-template.md`](artifacts/adr-template.md) in this folder. Either copy it into the repo beforehand (`docs/adr/adr-template.md`) or keep it open to paste — the demo ends by filling it in.
-- [ ] `docs/adr/` directory decision made: the ADR will be written to `src/BookTracker/docs/adr/0001-caching-strategy-for-hot-reads.md` (create the folder live; it's part of the show).
+- [ ] `docs/adr/` directory decision made: the ADR will be written to `src/c3/BookTracker/docs/adr/0001-caching-strategy-for-hot-reads.md` (create the folder live; it's part of the show).
 - [ ] Clock check: this is 6 minutes. Rehearse once; the trap is letting Claude's analysis run long-form while you read silently.
 
 ## Step-by-step script
@@ -65,7 +65,7 @@
 
 ## Recovery
 
-- No network dependency — nothing external can fail.
+- **Claude Code loses its connection:** nothing here runs without it. Switch to your hotspot; if that fails too, walk the steps from the slides and the expected-output notes below.
 - **Claude gives one option instead of three, or options without effort estimates:** don't accept it — reply "I asked for three options with effort in days; give me the other two" on camera. Making the model meet the brief *is* the demo.
 - **The analysis runs long:** cut it off — "that's enough context, give me the three-line summary of each option now" — and skip to the ADR step. The ADR is the artifact; protect it.
 - **An option is generic/ungrounded** (doesn't mention any BookTracker file): point at it — "which of our endpoints does this apply to?" — and let Claude self-correct. Narrate: "if it can't name the file, it didn't read the code."

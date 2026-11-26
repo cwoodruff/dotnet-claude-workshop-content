@@ -6,7 +6,7 @@
 | **Scheduled** | 12:20 PM (Section 2, final demo — the Lab 2 lead-in) |
 | **Duration** | 4 min |
 | **Risk** | Low (static — nothing executes) |
-| **Internet** | Not required |
+| **Internet** | Yes, for Claude Code's model connection (nothing else) |
 | **GitHub issue** | https://github.com/cwoodruff/dotnet-claude-workshop/issues/11 |
 
 ## What this demo teaches
@@ -23,22 +23,21 @@
 - [ ] Copy this demo's artifact into the BookTracker solution (run from the repo root):
 
       ```bash
-      mkdir -p "src/BookTracker/.claude/plugins/booktracker-kit"
-      cp "demos/Day 1/09-package-as-plugin/artifacts/booktracker-kit/plugin.json" "src/BookTracker/.claude/plugins/booktracker-kit/plugin.json"
+      mkdir -p "src/c1/BookTracker/.claude/plugins/booktracker-kit"
+      cp "demos/Day 1/09-package-as-plugin/artifacts/booktracker-kit/plugin.json" "src/c1/BookTracker/.claude/plugins/booktracker-kit/plugin.json"
       ```
 
-      Note: `src/BookTracker/.claude/plugins/booktracker-kit/plugin.json` already ships in the
-      repo; the copy refreshes it with this demo's version (adds the subagent to the description
-      and an `author` field). That is intended.
+      Lab 2's attendee manifest is `src/c2/BookTracker/.claude/plugins/booktracker-kit/plugin.json`;
+      this demo's version adds the subagent to the description and an `author` field.
 - [ ] The previous demos' artifacts staged (D4 skill, D4b rules, D5 agent, D6 hook +
       settings) — the plugin story only lands if the kit visibly *exists*:
 
       ```bash
-      find "src/BookTracker/.claude" -type f -not -name ".DS_Store"
+      find "src/c1/BookTracker/.claude" -type f -not -name ".DS_Store"
       ```
 
 - [ ] No fresh session needed — nothing here executes. Editor + terminal is enough.
-- [ ] Optional: `git status` clean-ish in `src/BookTracker` so the closing `git add .claude`
+- [ ] Optional: `git status` clean-ish in `src/c1/BookTracker` so the closing `git add .claude`
       shows a tidy, plausible diff. (Don't actually commit during the demo unless you want to —
       staging is the visual.)
 
