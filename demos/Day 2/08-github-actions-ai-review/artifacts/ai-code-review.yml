@@ -54,8 +54,10 @@ jobs:
               parameterized queries only, migrations in BookTracker.Data).
 
             Only real, high-signal findings. If you find nothing material, say so.
-            Read the change with `gh pr diff`, then post the result as a single comment with
-            `gh pr comment ${{ github.event.pull_request.number }} --body "<your review>"`.
+            Read the change with
+            `gh pr diff ${{ github.event.pull_request.number }} --repo ${{ github.repository }}`,
+            then post the result as a single comment with
+            `gh pr comment ${{ github.event.pull_request.number }} --repo ${{ github.repository }} --body "<your review>"`.
 
 # ---------------------------------------------------------------------------------------------
 # Alternative: own the plumbing with Claude Code headless (print mode) and the gh CLI.
