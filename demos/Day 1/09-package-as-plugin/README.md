@@ -1,0 +1,119 @@
+# Day 1 Demo D6b: Package as Plugin
+
+| | |
+|---|---|
+| **Slide deck** | `decks/Day 1/Section2-Steering-Claude-Code.pptx` |
+| **Scheduled** | 12:20 PM (Section 2, final demo — the Lab 2 lead-in) |
+| **Duration** | 4 min |
+| **Risk** | Low (static — nothing executes) |
+| **Internet** | Not required |
+| **GitHub issue** | https://github.com/cwoodruff/dotnet-claude-workshop/issues/11 |
+
+## What this demo teaches
+
+- A **plugin bundles** everything Section 2 built — skills + subagents + hooks (+ commands,
+  output styles) — into **one installable, versionable unit**.
+- The manifest (`plugin.json`) is tiny because **components are discovered by convention** from
+  the folder layout (`skills/`, `agents/`, `hooks/`, `commands/`), not enumerated in the manifest.
+- The two distribution paths: **commit `.claude/` into the repo** (the whole team inherits the
+  setup on clone) or **publish to a marketplace** for wider sharing.
+
+## Prerequisites / setup
+
+- [ ] Copy this demo's artifact into the BookTracker solution (run from the repo root):
+
+      ```bash
+      mkdir -p "src/BookTracker/.claude/plugins/booktracker-kit"
+      cp "demos/Day 1/09-package-as-plugin/artifacts/booktracker-kit/plugin.json" "src/BookTracker/.claude/plugins/booktracker-kit/plugin.json"
+      ```
+
+      Note: `src/BookTracker/.claude/plugins/booktracker-kit/plugin.json` already ships in the
+      repo; the copy refreshes it with this demo's version (adds the subagent to the description
+      and an `author` field). That is intended.
+- [ ] The previous demos' artifacts staged (D4 skill, D4b rules, D5 agent, D6 hook +
+      settings) — the plugin story only lands if the kit visibly *exists*:
+
+      ```bash
+      find "src/BookTracker/.claude" -type f -not -name ".DS_Store"
+      ```
+
+- [ ] No fresh session needed — nothing here executes. Editor + terminal is enough.
+- [ ] Optional: `git status` clean-ish in `src/BookTracker` so the closing `git add .claude`
+      shows a tidy, plausible diff. (Don't actually commit during the demo unless you want to —
+      staging is the visual.)
+
+## Step-by-step script
+
+1. **Recap what you built** (30 seconds). Show the tree:
+
+   ```bash
+   find .claude -type f -not -name ".DS_Store"
+   ```
+
+   Narrate: "In forty minutes we built a skill, two rules, a subagent, a guardrail hook, and the
+   settings that wire them. That's a team asset. How do we ship it?"
+
+2. **Show the manifest.** Open `.claude/plugins/booktracker-kit/plugin.json`:
+
+   ```json
+   {
+     "name": "booktracker-kit",
+     "version": "0.1.0",
+     "description": "BookTracker steering kit: API/data rules, the add-api-endpoint skill, the test-writer subagent, and a destructive-command guardrail hook.",
+     "author": {
+       "name": "BookTracker Team"
+     }
+   }
+   ```
+
+   Narrate: "That's the whole manifest — name, version, description. Notice what's *not* here:
+   no list of skills, no list of hooks."
+
+3. **Land the convention point:**
+
+   > "Components are discovered **by convention** from the plugin's folder layout — `skills/`
+   > folders, `agents/` markdown, `hooks/`, `commands/`. You don't register them in the manifest;
+   > you lay them out the same way we just did in `.claude/`, and the plugin picks them up."
+
+4. **Show distribution path #1 — commit the kit:**
+
+   ```bash
+   git add .claude
+   git status
+   ```
+
+   Expected output: `git status` lists the staged `.claude/` files (skill, rules, agent, hook,
+   settings, plugin manifest). Narrate: "Path one: check `.claude/` into the repo. Every teammate
+   who clones gets the skill, the rules, the subagent, and — most importantly — the guardrail.
+   Onboarding is `git clone`."
+
+5. **Name distribution path #2** (no live action): "Path two: publish the plugin to a
+   marketplace so teams beyond this repo can install it by name, pinned to a version."
+
+6. **Bridge to Lab 2** (this demo is the lead-in):
+
+   > "In Lab 2 you build your own kit: migrate your CLAUDE.md conventions into rules, write a
+   > skill with real gotchas, wire the guardrail hook, and stage it all with git. Everything you
+   > just watched, you now do."
+
+## Recovery
+
+None — this demo is static; nothing executes. If the manifest file is missing, re-run the copy
+command from setup (or even create the three-line JSON live — it's small enough to type, and
+typing it reinforces how minimal the manifest is). If `git add .claude` stages surprise files,
+that's fine — narrate what each one is; it's a recap, not a mistake.
+
+## Teaching callouts
+
+- **The manifest is small on purpose** — convention over configuration. The folder layout you
+  learned in D4–D6 *is* the packaging format.
+- **Version the kit like code.** `version: 0.1.0` matters: steering assets evolve, and teams
+  should review changes to hooks and rules like any other code review — a hook edit is a
+  behavior change for every developer's agent.
+- **The guardrail is the killer argument for committing `.claude/`:** a safety hook that only
+  exists on your machine protects only you.
+- **Confirm against current docs** before the workshop: the plugin manifest format is the
+  newest, fastest-moving surface in this section (it's on the night-before checklist in
+  `docs/Day 1/_instructor/demo-plan.md`).
+- Closing line for the section: "Steering isn't prompt tricks — it's an artifact you build,
+  version, and ship with the repo."

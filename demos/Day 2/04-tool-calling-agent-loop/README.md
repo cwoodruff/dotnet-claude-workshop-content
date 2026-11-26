@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **Deck** | `decks/Day 2/Day2-Section2-Streaming-Tools-Thinking.pptx` (slide 8, "Make It Real") |
-| **Section** | Day 2 · Section 2 — Streaming, Tool Calling & Extended Thinking (Block 2B) |
+| **Section** | Day 2 · Section 2 — Streaming, Tool Calling, Thinking & Effort (Block 2B) |
 | **Duration** | ~10 min |
 | **Risk** | Medium (live API; the model can answer without calling tools) |
 | **Internet** | Yes — Anthropic API |
