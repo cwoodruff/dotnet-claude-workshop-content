@@ -44,5 +44,5 @@ Endpoints are grouped under `BookTracker.Api/Endpoints/`. Data access lives in
 
 ## Notes
 
-- The starter has intentional gaps (missing validation, an entity-returning endpoint, etc.) — they're
+- The starter has intentional gaps (missing validation, a string-built SQL search, etc.) — they're
   there to find and fix, not to copy.
