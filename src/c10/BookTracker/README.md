@@ -5,8 +5,8 @@ for tracking books, backed by EF Core 10 and SQLite.
 
 > **c10 — responsible AI & the finished app.** *Day 2 · Section 6 — Responsible AI & Wrap-Up.* This
 > is `c9` hardened for production: **prompt-injection defenses**, an **AI audit log**, a
-> **token-budget middleware**, and security tests. This is the **final checkpoint** — the fully
-> hardened BookTracker, with all the earlier intentional teaching gaps closed.
+> **token-budget middleware**, and security tests. This is the **final checkpoint**. One starter
+> gap is still open: `BookRepository.SearchByTitleAsync` builds its SQL from the search term.
 
 ## What's new in this checkpoint
 

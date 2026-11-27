@@ -42,7 +42,7 @@ Each directory under `src/` (`c0`–`c10`) is a **complete, independently builda
 | [`c9`](src/c9/BookTracker/README.md) | 2 | Testing AI systems: LLM abstraction, agent tests, integration tests with Testcontainers, GitHub Actions AI review + release notes |
 | [`c10`](src/c10/BookTracker/README.md) | 2 | Responsible AI: prompt-injection defenses, AI audit logging, token-budget middleware, the effort setting, OpenTelemetry traces, security tests |
 
-⚠️ **Heads up:** the early checkpoints (`c0`–`c3`) contain *deliberate* problems — validation holes and a SQL-injection vector among them. Finding and fixing them is part of the labs, so resist the urge to "clean them up" before the workshop. The fully hardened app is `c10`.
+⚠️ **Heads up:** the starter contains *deliberate* problems — validation holes and a SQL-injection vector among them. Finding and fixing them is part of the labs, so resist the urge to "clean them up" before the workshop. `c10` adds the responsible-AI hardening, but the string-built SQL search in `BookRepository.SearchByTitleAsync` is still there in every checkpoint: don't ship any of them as-is.
 
 ## Getting started
 

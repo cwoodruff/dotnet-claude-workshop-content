@@ -39,6 +39,15 @@ for n in $(seq 0 10); do
   [[ $build_status -ne 0 ]] && failed=1
   [[ "$warnings" != "0" ]] && failed=1
   printf '%-5s %-8s %-9s %s\n' "c$n" "$([[ $build_status -eq 0 ]] && echo ok || echo FAILED)" "$warnings" "$tests"
+
+  # On a failure, show why: the build's errors and warnings, or the failing tests.
+  if [[ $build_status -ne 0 || "$warnings" != "0" ]]; then
+    printf '%s\n' "$build_out" | grep -E ': (error|warning) ' | sort -u | sed 's/^/      /' | head -20
+  fi
+  if [[ $build_status -eq 0 && ${test_status:-0} -ne 0 ]]; then
+    printf '%s\n' "$test_out" | grep -E -A4 '^\s*Failed |error' | sed 's/^/      /' | head -30
+  fi
+  test_status=0
 done
 
 if $show_diff; then
