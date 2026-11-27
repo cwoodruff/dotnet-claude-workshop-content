@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Net;
 using System.Text;
@@ -43,19 +44,34 @@ public class SdkTelemetryAndEffortTests
     [Fact]
     public async Task ChatAsync_WithListener_EmitsSpanWithTokenUsage()
     {
-        var spans = new List<Activity>();
+        // The listener sees every SDK call in the process, and other test classes run in parallel.
+        // Wrap this call in a root activity and keep only spans from its trace.
+        using var testSource = new ActivitySource("BookTracker.Tests.Telemetry");
+        var spans = new ConcurrentQueue<Activity>();
+        ActivityTraceId? traceId = null;
         using var listener = new ActivityListener
         {
-            ShouldListenTo = source => source.Name == "com.anthropic.sdk.csharp",
+            ShouldListenTo = source => source.Name is "com.anthropic.sdk.csharp" or "BookTracker.Tests.Telemetry",
             Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllDataAndRecorded,
-            ActivityStopped = spans.Add,
+            ActivityStopped = activity =>
+            {
+                if (activity.TraceId == traceId && activity.Source.Name == "com.anthropic.sdk.csharp")
+                {
+                    spans.Enqueue(activity);
+                }
+            },
         };
         ActivitySource.AddActivityListener(listener);
         var (service, _) = Create(effort: null);
 
-        await service.ChatAsync("Hi", []);
+        using (var root = testSource.StartActivity("test-root"))
+        {
+            Assert.NotNull(root);
+            traceId = root.TraceId;
+            await service.ChatAsync("Hi", []);
+        }
 
-        var span = Assert.Single(spans, s => s.GetTagItem("gen_ai.request.model") is not null);
+        var span = Assert.Single(spans);
         Assert.Equal("claude-opus-5-5", span.GetTagItem("gen_ai.request.model"));
         Assert.Equal(12L, Convert.ToInt64(span.GetTagItem("gen_ai.usage.input_tokens")));
         Assert.Equal(3L, Convert.ToInt64(span.GetTagItem("gen_ai.usage.output_tokens")));
