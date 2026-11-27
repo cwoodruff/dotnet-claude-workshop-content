@@ -29,6 +29,7 @@ cases=(
   "0|git push origin main"
   "0|Remove-Item bin"
   "0|git status"
+  "2|<not json>"
 )
 
 fail=0
@@ -42,7 +43,9 @@ while IFS= read -r hook; do
   echo "== $root"
   for c in "${cases[@]}"; do
     want="${c%%|*}"; cmd="${c#*|}"
-    got=$(cd "$root" && printf '{"tool_input":{"command":"%s"}}' "$cmd" \
+    json=$(printf '{"tool_input":{"command":"%s"}}' "$cmd")
+    [[ "$cmd" == "<not json>" ]] && json="not json"
+    got=$(cd "$root" && printf '%s' "$json" \
       | dotnet run .claude/hooks/block-destructive.cs >/dev/null 2>&1; echo $?)
     if [[ "$got" == "$want" ]]; then echo "  ok    exit=$got  $cmd"
     else echo "  FAIL  exit=$got want=$want  $cmd"; fail=1

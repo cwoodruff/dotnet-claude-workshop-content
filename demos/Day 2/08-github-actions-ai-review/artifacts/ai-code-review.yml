@@ -65,7 +65,7 @@ jobs:
 #
 #     - name: Install Claude Code (native installer, pinned, no Node needed)
 #       run: |
-#         curl -fsSL https://claude.ai/install.sh | bash -s 2.1.332
+#         curl --proto '=https' --tlsv1.2 -fsSL https://claude.ai/install.sh | bash -s 2.1.332
 #         echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 #
 #     - name: Review the diff
