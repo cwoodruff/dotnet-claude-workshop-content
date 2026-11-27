@@ -1,0 +1,27 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Day 2 FAQ</title><link rel="stylesheet" href="card.css"></head><body class="roomy">
+<h1>Day 2 FAQ <span class="accent">· Common Participant Questions</span></h1>
+<p class="sub">Quick answers to the questions that come up most. .NET AI with Claude Workshop.</p>
+
+<div class="q lead"><h3><span class="qn">Q1</span>"My Pro subscription works for Claude Code. Why do I need an API key today?"</h3>
+<p>Your plan powers Claude.ai and Claude Code. Day 2 calls the <span class="hl">Anthropic API</span> directly, and the API always uses a <span class="hl">Console key</span>. <span class="hl">Max and Team</span> plans include a monthly API credit you link to a Console organization; on <span class="hl">Pro</span> the API is pay-as-you-go.</p></div>
+
+<div class="q"><h3><span class="qn">2</span>"Which NuGet package is the official one?"</h3>
+<p><span class="hl">Anthropic (v13.x)</span>. Community options exist (Anthropic.SDK, Claudia). Old <code>tryAGI.Anthropic v3.x</code> is a different lineage: migrate / upgrade.</p></div>
+
+<div class="q"><h3><span class="qn">3</span>"Why register AnthropicClient as a Singleton?"</h3>
+<p>It holds an <code>HttpClient</code> internally; Scoped / Transient leads to <span class="hl">socket exhaustion</span>, the same reason you use <code>IHttpClientFactory</code>.</p></div>
+
+<div class="q"><h3><span class="qn">4</span>"Do I need an OpenAI key for the RAG section?"</h3>
+<p><span class="hl">No</span>. Use the free / local path (Ollama + <b>nomic-embed-text</b>) behind the same <code>EmbeddingService</code> interface; set the Qdrant vector size to the model's dimensions (768).</p></div>
+
+<div class="q"><h3><span class="qn">5</span>"How is the C# MCP server different from yesterday's GitHub MCP server?"</h3>
+<p>Yesterday you <span class="hl">used</span> a server as a host; today you <span class="hl">build</span> one with the C# SDK (v2.x). Same architecture (host / client / server; tools / resources / prompts), exposed over <span class="hl">Streamable HTTP</span>, stateless by default, so any host, including Claude Code, can call it.</p></div>
+
+<div class="q"><h3><span class="qn">6</span>"How do I keep API costs under control?"</h3>
+<p>Prompt caching (95% off cached input on Opus/Sonnet 5.5), batch processing, <span class="hl">Sonnet 5.5</span> for mechanical / CI work, and per-request + per-user token budgets. <span class="see">See the Models &amp; Cost Reference.</span></p></div>
+
+<div class="q"><h3><span class="qn">7</span>"How do I actually enforce our AI governance rules?"</h3>
+<p><span class="hl">Deterministic controls, not prompts</span>: PreToolUse hooks, permissions, and managed settings (org-wide, non-overridable). <span class="see">Ties back to Day 1, Section 2.</span></p></div>
+
+<footer><b>.NET AI with Claude Workshop</b><span>dotnetclaude.com</span></footer>
+</body></html>

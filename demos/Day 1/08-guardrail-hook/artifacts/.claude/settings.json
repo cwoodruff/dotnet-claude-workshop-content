@@ -2,9 +2,9 @@
   "hooks": {
     "PreToolUse": [
       {
-        "matcher": "Bash",
+        "matcher": "Bash|PowerShell",
         "hooks": [
-          { "type": "command", "command": ".claude/hooks/block-destructive.sh" }
+          { "type": "command", "command": "dotnet run .claude/hooks/block-destructive.cs" }
         ]
       }
     ],

@@ -1,0 +1,35 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Models &amp; Cost Reference</title><link rel="stylesheet" href="card.css"></head><body>
+<h1>Models &amp; Cost Reference</h1>
+<p class="sub"><b>Free-first:</b> default to free / local where possible; pay only where it's genuinely required.</p>
+
+<h2><span class="n">1</span>Model lineup &amp; pricing<span class="note">per 1M tokens (USD)</span></h2>
+<table>
+<tr><th>Model</th><th>Input / Output</th><th>Cache read</th><th>Use for</th></tr>
+<tr><td>Claude Opus 5.5</td><td>$4 / $20</td><td>$0.20</td><td>BookTracker app, Day 1 main session, judgment work</td></tr>
+<tr><td>Claude Sonnet 5.5</td><td>$2 / $10</td><td>$0.10</td><td>CI review, release notes, mechanical subagents</td></tr>
+<tr><td>Claude Haiku 5.5</td><td>$0.10 / $0.50</td><td>$0.01</td><td>Not used in this workshop ($0.50 / $2.50 over 100k-token prompts)</td></tr>
+</table>
+<p class="fine">Checked 2026-11-27. Verify current rates before the event. AiCost.cs (Section 6) uses these rates.</p>
+
+<h2><span class="n">2</span>Cost-reduction levers</h2>
+<div class="grid">
+<div class="cell"><b>Prompt caching <span class="tag">· Section 1</span></b><span>Cache reads cost 5% of input on Opus/Sonnet 5.5 (prefix of 512+ tokens).</span></div>
+<div class="cell"><b>Batch processing</b><span>50% off input and output for non-interactive workloads.</span></div>
+<div class="cell"><b>Model choice <span class="tag">· Section 5</span></b><span>Sonnet 5.5 for CI reviews and mechanical tasks, half the price of Opus.</span></div>
+<div class="cell"><b>Token budgets <span class="tag">· Section 6</span></b><span>Per-request MaxTokens cap plus a per-user daily budget.</span></div>
+</div>
+
+<h2><span class="n">3</span>Paid vs free / local map</h2>
+<table>
+<tr><th>Capability</th><th>Needs paid?</th><th>Free / local alternative</th></tr>
+<tr><td>Claude API calls<small>all sections</small></td><td><span class="yes">Yes</span>: Console API key</td><td>Max and Team plans include a monthly API credit that covers it</td></tr>
+<tr><td>RAG embeddings<small>Section 3</small></td><td><span class="yes">OpenAI key</span> by default</td><td>Ollama + <b>nomic-embed-text</b> (768-dim), same interface</td></tr>
+<tr><td>Vector store<small>Section 3</small></td><td><span class="no">No</span></td><td>Qdrant in Docker (local)</td></tr>
+<tr><td>Integration test infra<small>Section 5</small></td><td><span class="no">No</span></td><td>TestContainers (local Docker)</td></tr>
+<tr><td>Claude Code<small>Day 1</small></td><td><span class="yes">Pro min</span> ($20/mo)</td><td>Not available on Free</td></tr>
+</table>
+
+<div class="callout"><span class="badge">REMEMBER</span><div>Day 2 always needs a <b>Console API key</b>. <b>Max</b> and <b>Team</b> plans include monthly API credit: link a Console organization in claude.ai <b>Settings → Billing → API credits</b>. <b>Pro and Free</b> include none, so Day 2 is pay-as-you-go (a few dollars).</div></div>
+
+<footer><b>.NET AI with Claude Workshop</b><span>dotnetclaude.com</span></footer>
+</body></html>

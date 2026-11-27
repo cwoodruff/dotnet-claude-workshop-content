@@ -30,31 +30,26 @@
       cp -R "demos/Day 1/08-guardrail-hook/artifacts/.claude/." "src/c1/BookTracker/.claude/"
       ```
 
-      This stages/refreshes `.claude/hooks/block-destructive.sh` and `.claude/settings.json`.
-      Lab 2's attendee `settings.json` (in `src/c2/BookTracker/.claude/`) registers the same two
-      hooks; this demo's version adds a build timeout and a stricter pattern list.
-- [ ] **Make the hook executable** (`cp` normally preserves the bit, but verify — a missing +x is
-      the #1 way this demo dies):
+      This stages/refreshes `.claude/hooks/block-destructive.cs` and `.claude/settings.json`.
+      The hook is the same C# file Lab 2 attendees build (`src/c2/BookTracker/.claude/`); this
+      demo's `settings.json` adds a build timeout to the PostToolUse hook.
+- [ ] **Smoke-test the hook standalone, from `src/c1/BookTracker/`.** It reads the tool-call JSON
+      from stdin. The first run compiles the file (a few seconds), which also warms the cache so
+      the live demo isn't slow:
 
       ```bash
-      chmod +x "src/c1/BookTracker/.claude/hooks/block-destructive.sh"
-      ```
-
-- [ ] **Smoke-test the hook standalone** — it reads the tool-call JSON from stdin:
-
-      ```bash
-      echo '{"tool_input":{"command":"rm -rf bin"}}' | "src/c1/BookTracker/.claude/hooks/block-destructive.sh"; echo "exit=$?"
+      cd src/c1/BookTracker
+      echo '{"tool_input":{"command":"rm -rf bin"}}' | dotnet run .claude/hooks/block-destructive.cs; echo "exit=$?"
       ```
 
       Expected: `Blocked by guardrail: recursive force delete ('rm -rf') is not allowed...` and
       `exit=2`. Also check the allow path:
 
       ```bash
-      echo '{"tool_input":{"command":"dotnet build"}}' | "src/c1/BookTracker/.claude/hooks/block-destructive.sh"; echo "exit=$?"
+      echo '{"tool_input":{"command":"dotnet build"}}' | dotnet run .claude/hooks/block-destructive.cs; echo "exit=$?"
       ```
 
-      Expected: no output, `exit=0`.
-- [ ] `jq` installed (`which jq`) — the hook uses it to parse the tool JSON.
+      Expected: no output, `exit=0`. In PowerShell, check `$LASTEXITCODE` instead of `$?`.
 - [ ] **Start a FRESH `claude` session from `src/c1/BookTracker/` AFTER copying** — hooks in
       `settings.json` load at session start. A session that was already running will not see them.
       This is non-negotiable and is also the demo's own recovery lesson.
@@ -65,16 +60,16 @@
 
 1. **Show the registration first.** Open `.claude/settings.json` and narrate:
 
-   > "Two hooks. `PreToolUse` with matcher `Bash` — before Claude runs *any* shell command, this
-   > script gets the tool call as JSON on stdin. `PostToolUse` with matcher `Write|Edit` — after
+   > "Two hooks. `PreToolUse` with matcher `Bash|PowerShell` — before Claude runs *any* shell
+   > command, on any OS, this C# file gets the tool call as JSON on stdin. `PostToolUse` with matcher `Write|Edit` — after
    > every file change, `dotnet build` runs. Neither is a prompt. The model doesn't get a vote."
 
-2. **Show the script for 20 seconds.** Open `.claude/hooks/block-destructive.sh`; point at one
-   pattern (`rm -rf`) and the two-line payoff:
+2. **Show the script for 20 seconds.** Open `.claude/hooks/block-destructive.cs`; point at one
+   rule (`rm -rf`, with its PowerShell twin right below it) and the two-line payoff:
 
-   ```bash
-   echo "Blocked by guardrail: ..." >&2
-   exit 2
+   ```csharp
+   await Console.Error.WriteLineAsync($"Blocked by guardrail: {reason} is not allowed. ...");
+   return 2;
    ```
 
    > "Exit 2 means *blocked*. The stderr line is fed back to Claude as the reason."
@@ -120,9 +115,8 @@
   1. **Stale session** — you edited/copied `settings.json` after starting `claude`. Fix live and
      name it: "settings load at session start" — restart the session, retry. This recovery *is*
      part of the lesson.
-  2. **Missing execute bit** — `chmod +x .claude/hooks/block-destructive.sh`, restart, retry.
-  Also worth a glance: `which jq` (the script needs it) and that you launched from
-  `src/c1/BookTracker/`.
+  2. **Wrong folder** — the hook command is a relative path, so launch `claude` from
+     `src/c1/BookTracker/`. Also check `dotnet --version` reports 10.x (file-based apps need it).
 - **Hook blocks but no reason shows:** the reason goes to stderr — scroll the tool result in the
   transcript; the standalone smoke test from setup proves the script side in five seconds.
 - **PostToolUse build is slow or fails on pre-existing errors:** the hook has a 120s timeout; if

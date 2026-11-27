@@ -1,0 +1,31 @@
+# Proves the C# guardrail hook (block-destructive.cs) blocks and allows the same commands
+# on Linux, macOS and Windows. It tests the script, not Claude Code firing it.
+name: Hook tests
+
+on:
+  pull_request:
+    paths:
+      - '**/block-destructive.cs'
+      - '**/.claude/settings.json'
+      - 'tools/test-hooks.sh'
+      - '.github/workflows/hook-tests.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  hooks:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Run hook tests
+        shell: bash
+        run: tools/test-hooks.sh

@@ -1,0 +1,60 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Steering Reference Card</title><link rel="stylesheet" href="card.css"></head><body class="landscape">
+<div class="head">
+  <div><h1>Steering Reference Card</h1><div class="tag">The one page worth keeping.</div></div>
+  <div class="props"><small>DECIDE BY FOUR PROPERTIES</small>When it loads · Survives compaction · Context cost · Authority</div>
+</div>
+<div class="cols">
+<div class="left">
+<h2><span class="n">1</span>The seven methods<span class="note">where does this instruction belong?</span></h2>
+<table>
+<tr><th>Method</th><th>When it loads</th><th>Survives compaction</th><th>Context cost</th><th>Use it for</th></tr>
+<tr><td>CLAUDE.md (root)</td><td>Session start; re-read after compaction</td><td><span class="no">Yes</span>, memoized</td><td>Always in context (keep &lt;200 lines)</td><td>Facts &amp; soft conventions Claude needs all the time</td></tr>
+<tr><td>CLAUDE.md (subdir)</td><td>On demand when working in that dir</td><td>Partial</td><td>Low: loads only when relevant</td><td>Folder-specific facts</td></tr>
+<tr><td>Rules</td><td>Always (unscoped) or on file-match (path-scoped)</td><td><span class="no">Yes</span></td><td>Low to medium</td><td>Path-scoped conventions (e.g. per-project C# rules)</td></tr>
+<tr><td>Skills</td><td>On /name or auto-match by description</td><td>n/a: invoked</td><td>Low until triggered</td><td>A 30-line+ procedure with steps</td></tr>
+<tr><td>Subagents</td><td>When spawned</td><td>Isolated context; only the summary returns</td><td>Cheap to parent context</td><td>Out-of-sight heavy work; cost lever via model:</td></tr>
+<tr><td>Hooks</td><td>On events: SessionStart, PreToolUse, PostToolUse, Stop, PreCompact</td><td>n/a: deterministic</td><td>None: runs as code</td><td>"Every time X, do Y"; real guardrails (PreToolUse exit 2 blocks)</td></tr>
+<tr><td>Output styles</td><td>Session config</td><td>n/a</td><td>None</td><td>Changing how Claude formats responses</td></tr>
+<tr><td>Append-system-prompt</td><td>Session start (flag)</td><td><span class="no">Yes</span></td><td>Adds to every turn</td><td>One-off system-prompt additions</td></tr>
+</table>
+<h2><span class="n">2</span>Three decisions you'll actually use</h2>
+<div class="decision"><b><span class="l">a</span>"Every time X, always do Y" <span class="arrow">→ hook</span></b><span>The model choosing to run a formatter is not the same as it actually running.</span></div>
+<div class="decision"><b><span class="l">b</span>"Never do X" <span class="arrow">→ NOT a CLAUDE.md line</span></b><span>Use hooks · permissions · managed settings (org-wide, non-overridable).</span></div>
+<div class="decision"><b><span class="l">c</span>A 30-line procedure <span class="arrow">→ skill</span></b><span>CLAUDE.md is for facts Claude needs all the time.</span></div>
+</div>
+<div class="right">
+<h2><span class="n">3</span>"Where does this go?"</h2>
+<div class="chain"><span class="box">HOOK</span><i>→</i><span class="box">SKILL</span><i>→</i><span class="box">RULE</span><i>→</i><span class="box">CLAUDE.md</span><i>→</i><span class="box">SUBAGENT</span></div>
+<p class="fine">Try the most deterministic / cheapest home first.</p>
+<h2><span class="n">4</span>.NET copy-paste starters</h2>
+<pre><span class="lbl">Path-scoped C# rule · .claude/rules/data-access.md</span><span class="k">---</span>
+paths: ["BookTracker.Data/**/*.cs"]
+<span class="k">---</span>
+Use async EF Core calls; never block on .Result.</pre>
+<pre><span class="lbl">Skill folder layout</span>.claude/skills/add-api-endpoint/
+├─ SKILL.md
+├─ references/
+└─ scripts/</pre>
+<pre><span class="lbl">Subagent · .claude/agents/test-writer.md</span><span class="k">---</span>
+name: test-writer
+description: Generates xUnit tests
+model: claude-sonnet-5-5
+<span class="k">---</span>
+# body = system prompt</pre>
+<pre><span class="lbl">Guardrail hook · settings.json (any OS)</span>{ "hooks": { "PreToolUse": [{
+  "matcher": "Bash|PowerShell",
+  "hooks": [{ "type": "command",
+    "command": "dotnet run .claude/hooks/block-destructive.cs" }]
+}] } }</pre>
+<h2><span class="n">5</span>Gotchas worth remembering</h2>
+<ul class="gotchas">
+<li><b>Skills are folders, not files.</b> Subagents are .md, not .yaml.</li>
+<li>Path-scoped rules load <b>on read, not create</b>: make creation-time rules unscoped.</li>
+<li>User-level ~/.claude/rules/ paths: is currently unreliable; use project-level.</li>
+<li>A skill's <b>description</b> is a trigger written for the model; its <b>Gotchas</b> section is the high-value part.</li>
+<li>Hooks load at <b>session start</b>: restart claude after editing settings.json.</li>
+</ul>
+</div>
+</div>
+<footer><span><b>.NET AI with Claude Workshop</b> · Day 1</span><span>dotnetclaude.com</span></footer>
+</body></html>

@@ -11,7 +11,7 @@
 
 ## What this demo teaches
 
-- The install paths per OS: macOS/Linux is a one-line npm install; Windows runs everything inside **WSL2** (not PowerShell or CMD — hooks and subagents later today need a Linux shell).
+- The install paths per OS: one native-installer line each, `curl ... | bash` on macOS/Linux and `irm ... | iex` in Windows PowerShell. No Node.js, no WSL2; the hooks later today are C# files that run the same everywhere.
 - Authentication options: browser **OAuth with a Claude.ai Pro/Max subscription** (recommended today, no keys to manage) vs. an `ANTHROPIC_API_KEY` (the pay-as-you-go path attendees will use on Day 2).
 - The two ways to run the same agent: the interactive REPL (`claude`) and one-shot mode (`claude "prompt"`).
 - "Same agent, three surfaces" — terminal today; VS Code and JetBrains come in Section 3.
@@ -21,24 +21,28 @@
 Stage all of this **before doors open** (it is on the night-before checklist):
 
 - [ ] A clean terminal on the demo machine, large font, dark-on-light or high-contrast theme readable from the back row.
-- [ ] Node.js 18+ installed and on PATH (`node --version` — an old Node is the #1 install failure).
+- [ ] The .NET 10 SDK on PATH (`dotnet --version`); the Section 2 hook needs it, Claude Code itself doesn't.
 - [ ] **Either** Claude Code already uninstalled so the install is genuinely live, **or** (safer) already installed and verified, and you narrate the one-liner while it no-ops. Decide before you start; do not discover mid-demo.
 - [ ] You are logged in to Claude.ai in the demo machine's default browser with a **paid** (Pro/Max) account, so the OAuth hop is one click.
-- [ ] If demoing the Windows path: a WSL2 Ubuntu terminal ready and tested, or a screenshot of the flow if you're on a Mac.
+- [ ] If demoing the Windows path: a PowerShell window ready and tested, or a screenshot of the flow if you're on a Mac.
 - [ ] A TA is briefed and circulating — this demo doubles as the straggler-rescue window.
 - [ ] Smoke test the night before: `claude "What is today's date?"` returns a sensible answer.
 
 ## Step-by-step script
 
-1. **Frame it (30 s).** Point at slide 7. Say: "macOS and Linux, one line. Windows, everything runs inside WSL2 — not PowerShell or CMD, because hooks and subagents need a Linux shell later today."
+1. **Frame it (30 s).** Point at slide 7. Say: "One line on every OS. curl on macOS and Linux, irm in PowerShell on Windows. No Node, no WSL."
 
-2. **Install.** Type and run, narrating that this is the same command on macOS, Linux, and inside WSL2:
+2. **Install.** Type and run, narrating that Windows attendees run the PowerShell line instead:
 
    ```bash
-   npm install -g @anthropic-ai/claude-code
+   curl -fsSL https://claude.ai/install.sh | bash
    ```
 
-   **Expected output:** npm resolves and installs the package, ending with something like `added N packages in Xs` (or `changed 1 package` if already installed — say so out loud, it's fine). Takes 15–60 s on conference Wi-Fi.
+   ```powershell
+   irm https://claude.ai/install.ps1 | iex
+   ```
+
+   **Expected output:** the installer downloads Claude Code and reports where it installed it (if it's already installed, say so out loud, it's fine). Takes 15–60 s on conference Wi-Fi. If `claude` isn't found afterward, open a new terminal so it picks up the updated `PATH`.
 
 3. **Verify the binary.**
 
@@ -77,14 +81,14 @@ Stage all of this **before doors open** (it is on the night-before checklist):
 ## Recovery
 
 - **Install fails on the demo machine:** don't debug live past ~90 seconds. Fall back to an attendee who is already set up — put their screen on the projector (or narrate over their shoulder) and let the TA take your machine. The show goes on.
-- **Old Node version** (the most common failure): `npm install -g` errors or `claude` crashes at startup. Fix is `node --version` → upgrade to 18+ (nvm: `nvm install --lts && nvm use --lts`) → reinstall. Hand to the TA if it's an attendee machine.
-- **Windows attendee in PowerShell/CMD:** the fix is not troubleshooting PowerShell — it's moving them into the WSL2 Ubuntu terminal and reinstalling there. If WSL2 itself isn't installed, that's a 10+ minute detour: TA pairs with them through Lab 1 Part A while the room moves on.
+- **`claude: command not found` right after install** (the most common failure): the terminal predates the install. Open a new terminal; if it's still missing, check the installer's folder (`~/.local/bin` on macOS/Linux) is on `PATH`. Hand to the TA if it's an attendee machine.
+- **Windows attendee in CMD:** use the PowerShell line (`irm ... | iex` is PowerShell syntax). Open PowerShell or Windows Terminal and rerun it.
 - **OAuth browser hop fails / wrong account:** sign out of Claude.ai in the browser, re-run `claude`, sign in with the paid account. If the room's network blocks the callback, use the API-key path as a visible fallback (`export ANTHROPIC_API_KEY=...` from a key you have staged — never show the key on screen).
 - **Conference Wi-Fi dies mid-install:** switch to your phone hotspot. Keep it handy: every later demo still needs Claude Code's model connection, even when it only reads local files.
 
 ## Teaching callouts
 
 - "Same agent, three surfaces — today we run it in the terminal."
-- "Windows means WSL2, not PowerShell — hooks and subagents need a Linux shell this afternoon."
+- "One native install line per OS. No Node, no WSL."
 - "OAuth with your subscription today; an API key tomorrow when you start *building* against the API."
 - "If `claude --version` prints a version, you're ready — that's the whole readiness check."

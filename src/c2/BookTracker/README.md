@@ -21,7 +21,7 @@ for tracking books, backed by EF Core 10 and SQLite.
 ├── agents/
 │   └── test-writer.md                  # a custom sub-agent for writing xUnit tests
 ├── hooks/
-│   └── block-destructive.sh            # PreToolUse guard against destructive Bash commands
+│   └── block-destructive.cs            # PreToolUse guard against destructive shell commands
 ├── skills/
 │   └── add-api-endpoint/               # a reusable skill: route + handler + DTOs + test
 │       ├── SKILL.md
@@ -33,8 +33,8 @@ for tracking books, backed by EF Core 10 and SQLite.
 - **Rules** — conventions moved out of `CLAUDE.md` into `.claude/rules/`, loaded automatically only
   when Claude works in the matching files (`api-endpoints.md`, `data-access.md`). `CLAUDE.md` now just
   points at them.
-- **`settings.json` hooks** — a **PreToolUse** hook runs `block-destructive.sh` before any `Bash`
-  call, and a **PostToolUse** hook runs `dotnet build` after every `Edit`/`Write` so a broken change
+- **`settings.json` hooks** — a **PreToolUse** hook runs `block-destructive.cs` (a C# file, via
+  `dotnet run`, so it works on every OS) before any `Bash` or `PowerShell` call, and a **PostToolUse** hook runs `dotnet build` after every `Edit`/`Write` so a broken change
   surfaces immediately.
 - **`test-writer` agent** — a focused sub-agent you can dispatch to write tests in the house style.
 - **`add-api-endpoint` skill** — a repeatable procedure for adding an endpoint (DTOs → handler →
