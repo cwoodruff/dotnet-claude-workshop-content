@@ -34,7 +34,15 @@ builder.Services.AddDistributedMemoryCache();
 // (update_reading_progress calls the C4 IReadingProgressService — Day 1's feature is the agent's write surface).
 builder.Services.AddScoped<BookTracker.Api.Tools.BookTrackerTools>();
 builder.Services.AddScoped<IStreamingService, StreamingService>();
-builder.Services.AddScoped<IAgentService, AgentService>();
+// Lab 2 Part C: the same agent, with the SDK's tool runner driving the loop. Flip Anthropic:UseToolRunner.
+if (builder.Configuration.GetValue<bool>("Anthropic:UseToolRunner"))
+{
+    builder.Services.AddScoped<IAgentService, ToolRunnerAgentService>();
+}
+else
+{
+    builder.Services.AddScoped<IAgentService, AgentService>();
+}
 
 var app = builder.Build();
 

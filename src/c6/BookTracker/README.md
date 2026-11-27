@@ -20,6 +20,8 @@ for tracking books, backed by EF Core 10 and SQLite.
 - **`AgentService`** (`IAgentService`) — the agent loop: send the message + tool definitions to
   Claude, execute any tool calls it returns, feed the results back, and repeat until Claude produces a
   final answer. Exposed at `POST /api/agent`.
+- **`ToolRunnerAgentService`** (`IAgentService`) — the same agent with the SDK's tool runner driving
+  the loop (Lab 2 Part C). Set `Anthropic:UseToolRunner` to `true` to use it.
 - **`AgentDtos`** — request/result shapes for the agent endpoint.
 
 This is the checkpoint where Claude stops just *talking about* books and starts *acting on* them via
@@ -55,6 +57,7 @@ BookTracker.Api/
 ├── Tools/BookTrackerTools.cs           # ← NEW: find_book, get/update_reading_progress
 ├── Services/StreamingService.cs        # ← NEW: SSE streaming
 ├── Services/AgentService.cs            # ← NEW: the tool-use agent loop
+├── Services/ToolRunnerAgentService.cs  # ← NEW: the same agent on the SDK's tool runner
 └── Endpoints/AgentEndpoints.cs         # ← NEW: GET /api/chat/stream + POST /api/agent
 ```
 

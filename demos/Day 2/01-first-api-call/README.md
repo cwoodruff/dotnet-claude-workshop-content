@@ -87,7 +87,7 @@ This is the "Day 2 opens with code, not slides" moment — a real Claude respons
 
   If it still fails, check for a pasted trailing space or a revoked key; `dotnet user-secrets list` shows what's actually stored.
 - **"No API key found" message:** you ran from the wrong directory or the secret was set against a different project — user-secrets are keyed by the `UserSecretsId` in the csproj (`day2-demo1-first-api-call`). `cd` into `src/Demo1.FirstApiCall` and set it again.
-- **429 / 529:** transient — re-run once. Narrate that the SDK already retries these twice by default and Polly comes up in Block 1C.
+- **429 / 529:** transient — re-run once. Narrate that the SDK already retried them twice with backoff before you saw the error (Block 1C).
 - **Network/API fully down:** show the backup screenshot of a successful run, walk the code anyway, and promise a live re-run after the break. The teaching is the shape of the call, not the specific reply.
 
 ## Teaching callouts

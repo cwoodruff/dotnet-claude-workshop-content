@@ -16,4 +16,10 @@ public class AuditLogger
 
     public void ToolInvoked(string toolName, string argumentsSummary)
         => _logger.LogInformation("MCP tool invoked: {Tool} args=({Args})", toolName, argumentsSummary);
+
+    public void WriteConfirmed(string toolName, string argumentsSummary)
+        => _logger.LogInformation("MCP write confirmed by user: {Tool} args=({Args})", toolName, argumentsSummary);
+
+    public void WriteDeclined(string toolName, string argumentsSummary)
+        => _logger.LogWarning("MCP write declined, nothing written: {Tool} args=({Args})", toolName, argumentsSummary);
 }

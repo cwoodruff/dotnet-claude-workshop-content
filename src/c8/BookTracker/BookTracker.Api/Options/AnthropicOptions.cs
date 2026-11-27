@@ -13,4 +13,10 @@ public class AnthropicOptions
     public int MaxTokens { get; set; } = 4096;
 
     public string SystemPrompt { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Lab 2 Part C: true runs /api/agent through the SDK's tool runner (ToolRunnerAgentService),
+    /// false through the hand-written loop (AgentService).
+    /// </summary>
+    public bool UseToolRunner { get; set; }
 }

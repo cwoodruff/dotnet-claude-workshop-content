@@ -19,8 +19,8 @@
 - **The agent loop** — the reusable pattern for multi-step workflows: Claude requests a tool →
   you execute the C# method → you return a `tool_result` → Claude continues, possibly calling
   more tools, until `StopReason` is `EndTurn`. Implemented here as a visible **manual loop** so
-  every hop shows in the logs. (Mention the SDK's `BetaToolRunner`, which drives this same loop
-  for you — Lab 2 lets attendees choose either; the manual loop is the one you can log.)
+  every hop shows in the logs. Then end on the swap: the SDK's **tool runner** drives this same
+  loop for you, and it sends thinking blocks back on its own (Lab 2 Part C).
 - **Guardrails:** a max-iteration cap, and per-tool `try/catch` that returns an `is_error`
   `tool_result` instead of crashing — the model gets to read the error and recover.
 
@@ -107,9 +107,22 @@ tools to BookTracker's real services.
    *"No book with id 99. Use find_book to get a valid id."* and Claude recovers (searches or
    explains) instead of the app crashing. That's the `is_error` guardrail earning its keep.
 
-8. **Bridge to Lab 2 Part B:** attendees define the same 2+ tools against real BookTracker
-   services and run the loop (or `BetaToolRunner`) until `EndTurn`, with the iteration cap and
-   `is_error` handling as checkpoint items.
+8. **End on the swap (1 min, code only, no run).** Open
+   `src/c6/BookTracker/BookTracker.Api/Services/ToolRunnerAgentService.cs` in the content repo and
+   show the one call that replaces the whole loop:
+
+   ```csharp
+   var runner = _client.Beta.Messages.ToolRunner(params, runnableTools, thread: false, maxIterations: 5);
+   await foreach (var response in runner.WithCancellation(ct)) { last = response; }
+   ```
+
+   Say: *"Same tools, same cap, same is_error results. What it also does that our loop does by
+   hand: send the thinking blocks back with their signatures. You'll write the loop first, then
+   delete it."*
+
+9. **Bridge to Lab 2:** Part B builds the loop by hand against real BookTracker services, with the
+   iteration cap and `is_error` handling as checkpoint items; Part C swaps in the tool runner with
+   one setting, `Anthropic:UseToolRunner=true`.
 
 ## Recovery
 
