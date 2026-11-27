@@ -118,7 +118,7 @@ tools to BookTracker's real services.
 
    Say: *"Same tools, same cap, same is_error results. What it also does that our loop does by
    hand: send the thinking blocks back with their signatures. You'll write the loop first, then
-   delete it."*
+   switch it off with one setting."*
 
 9. **Bridge to Lab 2:** Part B builds the loop by hand against real BookTracker services, with the
    iteration cap and `is_error` handling as checkpoint items; Part C swaps in the tool runner with

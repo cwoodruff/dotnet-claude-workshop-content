@@ -85,7 +85,9 @@ public class BookMcpTools
         var confirmed = ReadConfirmation(context, fingerprint);
         if (confirmed is null)
         {
-            if (!server.IsMrtrSupported && server.ClientCapabilities?.Elicitation is null)
+            // True for 2026-07-28 clients, and for stateful 2025-11-25 sessions the SDK bridges to classic
+            // elicitation. Anything else can't show the form.
+            if (!server.IsMrtrSupported)
             {
                 audit.WriteDeclined("add_book", $"title={title}, authorId={authorId}, client cannot confirm");
                 return "Not added: this MCP client can't ask the user to confirm a write, so nothing was written.";
