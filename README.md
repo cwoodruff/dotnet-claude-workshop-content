@@ -71,6 +71,7 @@ The SQLite database is created, migrated, and seeded automatically at startup.
 For checkpoints `c5` and later, set your Anthropic API key with user secrets (never commit it):
 
 ```bash
+dotnet user-secrets init --project BookTracker.Api   # once per checkout; safe to rerun
 dotnet user-secrets set "Anthropic:ApiKey" "your-key-here" --project BookTracker.Api
 ```
 

@@ -26,6 +26,7 @@ for tracking books, backed by EF Core 10 and SQLite.
 
   ```bash
   cd src/c5/BookTracker
+  dotnet user-secrets init --project BookTracker.Api
   dotnet user-secrets set "Anthropic:ApiKey" "your-key-here" --project BookTracker.Api
   ```
 

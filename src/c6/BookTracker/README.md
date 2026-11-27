@@ -33,6 +33,7 @@ the Reading Progress feature you built in `c4`.
 
   ```bash
   cd src/c6/BookTracker
+  dotnet user-secrets init --project BookTracker.Api
   dotnet user-secrets set "Anthropic:ApiKey" "your-key-here" --project BookTracker.Api
   ```
 

@@ -44,6 +44,7 @@ Docker is optional until you switch `VectorStore:Provider` to `Qdrant`.
 ## Prerequisites
 
 - **Anthropic API key** (as before):
+  `dotnet user-secrets init --project BookTracker.Api`, then
   `dotnet user-secrets set "Anthropic:ApiKey" "your-key-here" --project BookTracker.Api`
 - **Ollama** for embeddings (local): `ollama pull nomic-embed-text && ollama serve`
 - **Docker** *(optional)* — only if you want the Qdrant-backed store instead of in-memory.
