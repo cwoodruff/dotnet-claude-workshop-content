@@ -107,7 +107,7 @@
   3. System prompt under the minimum (512 tokens on Opus 5.5)? The app prints its size at startup — if someone trimmed `BuildSystemPrompt`, restore the catalog loop.
   Turn the failure into the lesson: this exact debugging path is the teaching point.
 - **Auth fails:** same as Demo 1 — `dotnet user-secrets set "Anthropic:ApiKey" "sk-ant-..."` from *this* project folder (separate `UserSecretsId`), or fall back to `ANTHROPIC_API_KEY`.
-- **429 / 529:** transient; re-run. Note the SDK's built-in retries and the Polly discussion coming in Block 1C.
+- **429 / 529:** transient; re-run. Note the SDK's built-in retries (Block 1C).
 - **API fully down:** show the backup screenshot of the two-call run and walk the code; the numbers on the screenshot carry the point.
 
 ## Teaching callouts

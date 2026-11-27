@@ -31,7 +31,8 @@ BookTracker.Mcp/
 
 - **Search books** — find books whose title matches a query (returns JSON).
 - **Get reading progress** — a book's page / status / percent complete by id.
-- **Add book** — create a new book (the author must already exist).
+- **Add book** — create a new book (the author must already exist). Asks the user to confirm
+  first (an MRTR input-required result); a decline writes nothing.
 
 ## Prerequisites
 

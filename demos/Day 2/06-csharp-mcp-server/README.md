@@ -177,6 +177,9 @@ over the recording instead.**
   logs the invocation (who/what/when — the left terminal *is* the audit trail), and delegates to
   a service. The demo's `IBookCatalog` stands where the real server's `IBookService` and
   `DbContext` sit — the governance shape is identical.
+- **Writes ask first (Lab 4).** The demo's `add_book` writes straight away to keep the run short.
+  Lab 4's `add_book` returns an input-required result (MRTR, SDK 2.x) so Claude Code asks the user
+  to confirm, and only a yes writes. Say so when `add_book` fires.
 - **The description is the contract.** The model decides *whether* and *how* to call your tool
   from the `[Description]` text alone — same discipline as tool definitions in Section 2 and
   skills on Day 1.

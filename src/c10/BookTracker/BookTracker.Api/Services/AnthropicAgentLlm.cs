@@ -119,6 +119,7 @@ public class AnthropicAgentLlm : IAgentLlm
                 },
                 Messages = _messages,
                 Tools = BookTrackerTools.Definitions.Select(t => (ToolUnion)t).ToList(),
+                OutputConfig = _options.ToOutputConfig(),
             }, cancellationToken: ct);
 
             _lastResponse = response;

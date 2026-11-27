@@ -13,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Options;
 using OllamaSharp;
+using OpenTelemetry.Trace;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,7 +43,15 @@ builder.Services.AddDistributedMemoryCache();
 builder.Services.AddScoped<BookTracker.Api.Tools.BookTrackerTools>();
 builder.Services.AddScoped<IStreamingService, StreamingService>();
 builder.Services.AddScoped<IAgentLlm, AnthropicAgentLlm>();
-builder.Services.AddScoped<IAgentService, AgentService>();
+// Lab 2 Part C: the same agent, with the SDK's tool runner driving the loop. Flip Anthropic:UseToolRunner.
+if (builder.Configuration.GetValue<bool>("Anthropic:UseToolRunner"))
+{
+    builder.Services.AddScoped<IAgentService, ToolRunnerAgentService>();
+}
+else
+{
+    builder.Services.AddScoped<IAgentService, AgentService>();
+}
 
 // --- Day 2: RAG (BookTracker.VectorStore) ---
 builder.Services.Configure<VectorStoreOptions>(builder.Configuration.GetSection("VectorStore"));
@@ -73,6 +82,16 @@ builder.Services.AddScoped<IRagService, RagService>();
 
 // --- C10: responsible-AI hardening ---
 builder.Services.AddScoped<IAiAuditService, AiAuditService>();
+
+// Traces: the Anthropic SDK emits one span per API call (GenAI conventions: model, token usage,
+// time to first chunk) on this ActivitySource. Metadata only by default; prompts stay out of traces
+// unless ANTHROPIC_OPEN_TELEMETRY_TRACES_CONTENT_MODE=content. AiAuditLog still records cost and flags.
+builder.Services.AddOpenTelemetry()
+    .WithTracing(tracing => tracing
+        .AddSource("com.anthropic.sdk.csharp")
+        .AddConsoleExporter());
+        // Aspire dashboard or your own collector instead: add OpenTelemetry.Exporter.OpenTelemetryProtocol
+        // and replace the line above with .AddOtlpExporter(o => o.Endpoint = new Uri("http://localhost:4317")).
 
 var app = builder.Build();
 

@@ -48,6 +48,7 @@ public class ClaudeService : IClaudeService
                 new() { Text = _options.SystemPrompt, CacheControl = new CacheControlEphemeral() },
             },
             Messages = messages,
+            OutputConfig = _options.ToOutputConfig(),
         }, cancellationToken: ct);
 
         var reply = string.Concat(

@@ -42,7 +42,15 @@ builder.Services.AddDistributedMemoryCache();
 builder.Services.AddScoped<BookTracker.Api.Tools.BookTrackerTools>();
 builder.Services.AddScoped<IStreamingService, StreamingService>();
 builder.Services.AddScoped<IAgentLlm, AnthropicAgentLlm>();
-builder.Services.AddScoped<IAgentService, AgentService>();
+// Lab 2 Part C: the same agent, with the SDK's tool runner driving the loop. Flip Anthropic:UseToolRunner.
+if (builder.Configuration.GetValue<bool>("Anthropic:UseToolRunner"))
+{
+    builder.Services.AddScoped<IAgentService, ToolRunnerAgentService>();
+}
+else
+{
+    builder.Services.AddScoped<IAgentService, AgentService>();
+}
 
 // --- Day 2: RAG (BookTracker.VectorStore) ---
 builder.Services.Configure<VectorStoreOptions>(builder.Configuration.GetSection("VectorStore"));

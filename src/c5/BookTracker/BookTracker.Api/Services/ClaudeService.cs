@@ -54,6 +54,6 @@ public class ClaudeService : IClaudeService
             reply,
             (int)response.Usage.InputTokens,
             (int)response.Usage.OutputTokens,
-            (int)response.Usage.CacheReadInputTokens);
+            (int)(response.Usage.CacheReadInputTokens ?? 0));
     }
 }

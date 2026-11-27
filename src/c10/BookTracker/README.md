@@ -17,6 +17,13 @@ for tracking books, backed by EF Core 10 and SQLite.
 - **`TokenBudget.cs`** + **`AiCost.cs`** — model token accounting and cost estimation.
 - **`Middleware/TokenBudgetMiddleware.cs`** — enforces a per-request (or per-window) token budget so a
   runaway prompt can't rack up unbounded cost.
+- **Effort** — `Anthropic:Effort` in `appsettings.json` (`medium`) is sent as `OutputConfig.Effort`
+  on every call: how much of the `MaxTokens` budget goes to thinking.
+
+### Traces from the SDK
+
+- `Program.cs` listens to the SDK's `com.anthropic.sdk.csharp` spans with OpenTelemetry and a console
+  exporter: one span per model call with model and token usage. Metadata only; no prompts.
 
 ### AI audit logging
 
@@ -29,6 +36,8 @@ for tracking books, backed by EF Core 10 and SQLite.
 
 - **`PromptSafetyTests.cs`** — asserts injection attempts are neutralized.
 - **`AiCostTests.cs`** — asserts token/cost accounting behaves.
+- **`Observability/SdkTelemetryAndEffortTests.cs`** — the effort reaches the request, and a call
+  emits one span with model and token tags (fake HTTP handler, no key needed).
 
 ## Prerequisites
 
