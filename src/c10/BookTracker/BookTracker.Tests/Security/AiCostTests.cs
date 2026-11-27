@@ -21,11 +21,11 @@ public class AiCostTests
     }
 
     [Fact]
-    public void Estimate_Haiku_PriceStepsUpForLongPrompts()
+    public void Estimate_Haiku_UsesStandardRates()
     {
-        // Up to 100k input tokens: $0.10 / $0.50. Above that: $0.50 / $2.50.
+        // Haiku 5.5: $0.10/1M input, $0.50/1M output, even when summed usage passes 100k tokens.
         Assert.Equal(0.0015m, AiCost.Estimate("claude-haiku-5-5", 10_000, 1_000));
-        Assert.Equal(0.1025m, AiCost.Estimate("claude-haiku-5-5", 200_000, 1_000));
+        Assert.Equal(0.0205m, AiCost.Estimate("claude-haiku-5-5", 200_000, 1_000));
     }
 
     [Fact]

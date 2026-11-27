@@ -2,14 +2,14 @@
 @page { size: letter; margin: 0.5in 0.55in 0.45in; background: #f0eee6; }
 body { font-family: Inter, sans-serif; font-size: 8.6pt; line-height: 1.38; color: #141413; margin: 0; }
 h1 { font-family: "Source Serif 4", serif; font-weight: 700; font-size: 25pt; margin: 0; line-height: 1.1; }
-h1 .accent { color: #c25e40; }
+h1 .accent { color: #a84b2c; }
 .sub { color: #615c52; margin: 3pt 0 9pt; padding-bottom: 8pt; border-bottom: 1.2pt solid #d97757; }
-.sub b { color: #c25e40; }
-h2 { font-family: "Source Serif 4", serif; font-weight: 600; font-size: 12.5pt; color: #c25e40; margin: 13pt 0 5pt; display: flex; align-items: center; }
-h2 .n { display: inline-block; width: 12pt; height: 12pt; border-radius: 6pt; background: #d97757; color: #fff; font: 700 7.5pt Inter, sans-serif; text-align: center; line-height: 12pt; margin-right: 6pt; }
+.sub b { color: #a84b2c; }
+h2 { font-family: "Source Serif 4", serif; font-weight: 600; font-size: 12.5pt; color: #a84b2c; margin: 13pt 0 5pt; display: flex; align-items: center; }
+h2 .n { display: inline-block; width: 12pt; height: 12pt; border-radius: 6pt; background: #a84b2c; color: #fff; font: 700 7.5pt Inter, sans-serif; text-align: center; line-height: 12pt; margin-right: 6pt; }
 h2 .note { margin-left: auto; font: 400 7.5pt Inter, sans-serif; color: #615c52; }
 table { width: 100%; border-collapse: collapse; background: #fbfaf6; }
-th { background: #d97757; color: #fff; font-size: 7pt; letter-spacing: 0.4pt; text-transform: uppercase; text-align: left; padding: 4pt 6pt; }
+th { background: #a84b2c; color: #fff; font-size: 7pt; letter-spacing: 0.4pt; text-transform: uppercase; text-align: left; padding: 4pt 6pt; }
 td { padding: 4.5pt 6pt; border-bottom: 0.6pt solid #d8d3c6; vertical-align: top; }
 td:first-child { font-weight: 600; }
 td small { display: block; font-weight: 400; color: #615c52; font-size: 6.8pt; }
@@ -17,21 +17,21 @@ td small { display: block; font-weight: 400; color: #615c52; font-size: 6.8pt; }
 .grid { display: flex; flex-wrap: wrap; gap: 6pt; }
 .cell { width: calc(50% - 3pt); box-sizing: border-box; background: #fbfaf6; border: 0.6pt solid #d8d3c6; border-radius: 4pt; padding: 5pt 7pt; }
 .cell b { display: block; }
-.cell .tag { color: #c25e40; font-size: 6.8pt; font-weight: 400; }
+.cell .tag { color: #a84b2c; font-size: 6.8pt; font-weight: 400; }
 .cell span { color: #615c52; }
-.yes { color: #c25e40; font-weight: 700; }
+.yes { color: #a84b2c; font-weight: 700; }
 .no { color: #4f7a4a; font-weight: 700; }
 code, .mono { font-family: "Source Serif 4", serif; font-weight: 700; }
 .callout { margin-top: 13pt; background: #f4e4dc; border: 0.8pt solid #d97757; border-radius: 5pt; padding: 7pt 9pt; display: flex; gap: 9pt; align-items: center; }
-.badge { background: #c25e40; color: #fff; font: 700 8pt "Source Serif 4", serif; letter-spacing: 0.6pt; padding: 3pt 7pt; border-radius: 3pt; white-space: nowrap; }
-.callout b, .hl { color: #c25e40; font-weight: 700; }
+.badge { background: #a84b2c; color: #fff; font: 700 8pt "Source Serif 4", serif; letter-spacing: 0.6pt; padding: 3pt 7pt; border-radius: 3pt; white-space: nowrap; }
+.callout b, .hl { color: #a84b2c; font-weight: 700; }
 .q { margin: 10pt 0 0; }
-.q h3 { font-family: "Source Serif 4", serif; font-weight: 600; font-size: 10.5pt; color: #c25e40; margin: 0 0 2pt; }
+.q h3 { font-family: "Source Serif 4", serif; font-weight: 600; font-size: 10.5pt; color: #a84b2c; margin: 0 0 2pt; }
 .q h3 .qn { color: #141413; margin-right: 5pt; }
 .q p { margin: 0 0 0 12pt; }
 .q.lead { background: #f4e4dc; border: 0.8pt solid #d97757; border-radius: 5pt; padding: 7pt 9pt; margin-top: 4pt; }
 .q.lead p { margin-left: 0; }
-.q.lead .qn { background: #c25e40; color: #fff; font: 700 7pt Inter, sans-serif; padding: 1pt 5pt; border-radius: 2pt; }
+.q.lead .qn { background: #a84b2c; color: #fff; font: 700 7pt Inter, sans-serif; padding: 1pt 5pt; border-radius: 2pt; }
 .see { color: #615c52; }
 footer { position: fixed; bottom: -0.15in; left: 0; right: 0; display: flex; justify-content: space-between; border-top: 0.6pt solid #d8d3c6; padding-top: 4pt; font-size: 7pt; color: #615c52; }
 footer b { color: #141413; }
@@ -44,9 +44,9 @@ body.landscape { font-size: 7.4pt; page: landscape; }
 @page landscape { size: letter landscape; margin: 0.4in 0.45in 0.45in; background: #f0eee6; }
 .head { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 1.2pt solid #d97757; padding-bottom: 5pt; margin-bottom: 4pt; }
 .head h1 { font-size: 22pt; }
-.head .tag { color: #c25e40; font-family: "Source Serif 4", serif; font-weight: 600; font-size: 10.5pt; margin-top: 2pt; }
+.head .tag { color: #a84b2c; font-family: "Source Serif 4", serif; font-weight: 600; font-size: 10.5pt; margin-top: 2pt; }
 .head .props { text-align: right; font-size: 7pt; }
-.head .props small { display: block; color: #c25e40; font-weight: 700; letter-spacing: 0.5pt; font-size: 6.5pt; }
+.head .props small { display: block; color: #a84b2c; font-weight: 700; letter-spacing: 0.5pt; font-size: 6.5pt; }
 .cols { display: flex; gap: 14pt; }
 .cols .left { width: 56%; }
 .cols .right { width: 44%; }
@@ -55,14 +55,14 @@ body.landscape td, body.landscape th { padding: 3pt 4pt; }
 .decision { background: #fbfaf6; border: 0.6pt solid #d8d3c6; border-radius: 4pt; padding: 4pt 7pt; margin-bottom: 4pt; }
 .decision b { font-size: 8pt; }
 .decision span { display: block; color: #615c52; font-size: 6.8pt; margin-left: 14pt; }
-.decision span.arrow { display: inline; margin: 0; color: #c25e40; font-weight: 700; font-size: inherit; }
+.decision span.arrow { display: inline; margin: 0; color: #a84b2c; font-weight: 700; font-size: inherit; }
 .decision .l { display: inline-block; width: 10pt; height: 10pt; border-radius: 5pt; background: #141413; color: #fff; text-align: center; font-size: 6.5pt; line-height: 10pt; margin-right: 4pt; }
 .chain { display: flex; align-items: center; gap: 4pt; font-weight: 700; font-size: 6.8pt; }
 .chain span.box { border: 0.6pt solid #d8d3c6; background: #fbfaf6; border-radius: 3pt; padding: 3pt 7pt; }
-.chain i { color: #c25e40; font-style: normal; }
+.chain i { color: #a84b2c; font-style: normal; }
 pre { background: #262624; color: #f0eee6; border-radius: 4pt; padding: 5pt 7pt; margin: 0 0 5pt; font: 6.6pt/1.4 "DejaVu Sans Mono", monospace; white-space: pre-wrap; }
 pre .lbl { display: block; color: #e1a088; font: 700 6.3pt Inter, sans-serif; letter-spacing: 0.4pt; text-transform: uppercase; margin-bottom: 2pt; }
 pre .k { color: #e1a088; }
 ul.gotchas { margin: 0; padding-left: 11pt; }
 ul.gotchas li { margin-bottom: 2.5pt; }
-ul.gotchas b { color: #c25e40; }
+ul.gotchas b { color: #a84b2c; }

@@ -17,6 +17,8 @@ cases=(
   "2|git reset --hard HEAD~1"
   "2|git clean -fd"
   "2|DROP DATABASE booktracker"
+  '2|Remove-Item `\n  -Recurse `\n  -Force bin'
+  '2|rm \\\n  -rf bin'
   "2|rd /s /q obj"
   "0|dotnet build"
   "0|dotnet test"

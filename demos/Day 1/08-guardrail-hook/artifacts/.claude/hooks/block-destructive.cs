@@ -33,6 +33,10 @@ catch (JsonException)
     return 0; // Not a tool call we understand: let Claude Code decide.
 }
 
+// Join continued lines (PowerShell backtick, bash backslash) so a command split
+// across lines is checked as one line.
+command = Regex.Replace(command, @"[`\\][ \t]*\r?\n", " ", RegexOptions.None, TimeSpan.FromSeconds(1));
+
 foreach (var (pattern, reason) in rules)
 {
     if (Regex.IsMatch(command, pattern, RegexOptions.IgnoreCase, TimeSpan.FromSeconds(1)))
