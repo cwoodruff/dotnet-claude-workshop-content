@@ -46,6 +46,8 @@ jobs:
               code, config, or logs.
             - Missing error handling: unguarded external calls, swallowed exceptions,
               missing cancellation-token propagation, and absent not-found/bad-request paths.
+            - Invented or outdated APIs: methods or packages that don't exist in the
+              referenced versions.
             - CLAUDE.md and .claude/rules/ violations specific to this repo:
               - Endpoints must return DTOs/records, never EF Core entities.
               - Endpoints must be thin and async — no blocking (.Result/.Wait()), business

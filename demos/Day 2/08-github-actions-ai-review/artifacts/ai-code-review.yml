@@ -76,7 +76,7 @@ jobs:
 #       run: |
 #         set -euo pipefail
 #         git diff "origin/${{ github.base_ref }}...HEAD" > pr.diff
-#         claude -p "Review this BookTracker pull request diff for security issues, .NET issues, missing error handling, and CLAUDE.md / .claude/rules/ violations. Short markdown bullet list with file references; say so if nothing material." \
+#         claude -p "Review this BookTracker pull request diff for security issues, .NET issues, missing error handling, invented or outdated APIs or packages, and CLAUDE.md / .claude/rules/ violations. Short markdown bullet list with file references; say so if nothing material." \
 #           --model claude-sonnet-5-5 < pr.diff > review.md
 #
 #     - name: Post review comment

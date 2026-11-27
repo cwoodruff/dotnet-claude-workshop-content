@@ -11,7 +11,7 @@
 
 ## What this demo teaches
 
-- The **review skill, now in CI**: the six .NET failure-mode checks attendees ran locally with `/dotnet-review` on Day 1 (beside the built-in `/code-review`) become an automated PR gate — the Day 1 steering touchpoint made concrete.
+- The **review skill, now in CI**: the six .NET failure-mode checks shown with `/dotnet-review` on Day 1 (beside the built-in `/code-review`) become an automated PR gate — the Day 1 steering touchpoint made concrete.
 - The cleanest path is the **official `anthropics/claude-code-action`** — it handles checkout, diff, and PR plumbing and posts the comment for you. The DIY alternative is Claude Code **headless** (`claude -p`, print mode) over the diff plus `gh pr comment`.
 - **Cost tiering in CI**: `--model claude-sonnet-5-5` is the right tier for mechanical review work and keeps every PR review cheap.
 - What the review hunts for: security issues, .NET issues, missing error handling, and **CLAUDE.md / `.claude/rules/` violations** — your project conventions become enforceable review criteria.
@@ -34,7 +34,7 @@ Everything here is on `artifacts/demo-pr-checklist.md` in more detail — the sh
 
 ## Step-by-step script
 
-1. **Frame it (45 s).** "Yesterday you ran `/dotnet-review` by hand, then the built-in `/code-review` to compare. That review is a *skill* — a playbook. Playbooks that live in one developer's terminal don't scale; playbooks in CI review every PR whether or not anyone remembers. Same discipline, promoted into the pipeline."
+1. **Frame it (45 s).** "Yesterday you saw `/dotnet-review` run by hand, then the built-in `/code-review` to compare. That review is a *skill* — a playbook. Playbooks that live in one developer's terminal don't scale; playbooks in CI review every PR whether or not anyone remembers. Same discipline, promoted into the pipeline."
 
 2. **Show the workflow file (90 s).** Open `.github/workflows/ai-code-review.yml` in the demo repo (same content as `artifacts/ai-code-review.yml`). Walk top to bottom:
    - `on: pull_request` — every PR against `main` gets reviewed.
