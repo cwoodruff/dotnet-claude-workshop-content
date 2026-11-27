@@ -1,4 +1,6 @@
 using System.ComponentModel;
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json;
 using BookTracker.Core.Dtos;
 using BookTracker.Core.Services;
@@ -77,7 +79,10 @@ public class BookMcpTools
 
         // A write is the one call that needs a human yes. First pass: ask the user through the client
         // and stop. Second pass (the client retries with the answer): write only on an explicit yes.
-        var confirmed = ReadConfirmation(context);
+        // The answer only counts for these exact arguments: the fingerprint travels as request state and
+        // must match on the retry, so a confirmation can't be reused for a different book.
+        var fingerprint = Fingerprint(title, authorId, totalPages, isbn, genre);
+        var confirmed = ReadConfirmation(context, fingerprint);
         if (confirmed is null)
         {
             if (!server.IsMrtrSupported && server.ClientCapabilities?.Elicitation is null)
@@ -86,7 +91,8 @@ public class BookMcpTools
                 return "Not added: this MCP client can't ask the user to confirm a write, so nothing was written.";
             }
 
-            throw ConfirmationRequired($"Add \"{title}\" ({totalPages} pages, author id {authorId}) to BookTracker?");
+            throw ConfirmationRequired(
+                $"Add \"{title}\" ({totalPages} pages, author id {authorId}) to BookTracker?", fingerprint);
         }
 
         if (confirmed == false)
@@ -109,7 +115,7 @@ public class BookMcpTools
     /// the user a yes/no form, then call the tool again with the answer. Works on stateless HTTP; for
     /// older clients the SDK sends the same question as a classic elicitation request.
     /// </summary>
-    private static InputRequiredException ConfirmationRequired(string message)
+    private static InputRequiredException ConfirmationRequired(string message, string fingerprint)
         => new(
             new Dictionary<string, InputRequest>
             {
@@ -126,18 +132,20 @@ public class BookMcpTools
                     },
                 }),
             },
-            null);
+            fingerprint);
 
     /// <summary>
-    /// The user's answer from the retried call: null when the user hasn't been asked yet, true only for
-    /// an accepted form with confirm = true. Decline, cancel and anything else are false (fail closed).
+    /// The user's answer from the retried call: null when the user hasn't been asked about these exact
+    /// arguments yet, true only for an accepted form with confirm = true. Decline, cancel and anything
+    /// else are false (fail closed).
     /// </summary>
-    private static bool? ReadConfirmation(RequestContext<CallToolRequestParams> context)
+    private static bool? ReadConfirmation(RequestContext<CallToolRequestParams> context, string fingerprint)
     {
         if (context.Params?.InputResponses is not { } responses
-            || !responses.TryGetValue(ConfirmKey, out var response))
+            || !responses.TryGetValue(ConfirmKey, out var response)
+            || context.Params.RequestState != fingerprint)
         {
-            return null;
+            return null; // not asked yet, or asked about different arguments: ask again
         }
 
         var result = response.Deserialize(InputResponse.ElicitResultJsonTypeInfo);
@@ -146,6 +154,10 @@ public class BookMcpTools
             && content.TryGetValue("confirm", out var value)
             && value.ValueKind == JsonValueKind.True;
     }
+
+    private static string Fingerprint(string title, int authorId, int totalPages, string? isbn, string? genre)
+        => Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(
+            JsonSerializer.Serialize(new { title, authorId, totalPages, isbn, genre }))));
 
     private static string Serialize(object? value) => JsonSerializer.Serialize(value);
 }
