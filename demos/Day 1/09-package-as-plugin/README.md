@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **Slide deck** | `decks/Day 1/Section2-Steering-Claude-Code.pptx` |
-| **Scheduled** | 12:20 PM (Section 2, final demo — the Lab 2 lead-in) |
+| **Scheduled** | 12:08 PM (Section 2, final demo — the Lab 2 lead-in) |
 | **Duration** | 4 min |
 | **Risk** | Low (one read-only `claude plugin validate`) |
 | **Internet** | Yes, for Claude Code's model connection (nothing else) |

@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **Slide deck** | `decks/Day 1/Section2-Steering-Claude-Code.pptx` |
-| **Scheduled** | 11:18 AM (Section 2, Block 2B — after the "skills are folders" slides) |
+| **Scheduled** | 11:05 AM (Section 2, Block 2B — after the "skills are folders" slides) |
 | **Duration** | 8 min |
 | **Risk** | Low |
 | **Internet** | Yes, for Claude Code's model connection (nothing else) |
