@@ -1,4 +1,5 @@
-# AI code review on every pull request: the Day 1 code-review discipline, promoted into CI.
+# AI code review on every pull request: the six .NET failure-mode checks from Day 1's
+# /dotnet-review skill, promoted into CI.
 # Copy to .github/workflows/ai-code-review.yml and merge it to main BEFORE opening the demo PR
 # (pull_request workflows run the file from the base branch).
 # Needs: the ANTHROPIC_API_KEY repo secret, and Actions allowed to write to pull requests.
@@ -50,6 +51,7 @@ jobs:
             - .NET issues: blocking calls (.Result/.Wait()), dropped CancellationToken,
               EF entities returned from endpoints, wrong status codes.
             - Missing error handling: swallowed exceptions, absent not-found/bad-request paths.
+            - Invented or outdated APIs: methods or packages that don't exist in the referenced versions.
             - Violations of CLAUDE.md and .claude/rules/ (DTOs not entities, thin async endpoints,
               parameterized queries only, migrations in BookTracker.Data).
 
@@ -74,7 +76,7 @@ jobs:
 #       run: |
 #         set -euo pipefail
 #         git diff "origin/${{ github.base_ref }}...HEAD" > pr.diff
-#         claude -p "Review this BookTracker pull request diff for security issues, .NET issues, missing error handling, and CLAUDE.md / .claude/rules/ violations. Short markdown bullet list with file references; say so if nothing material." \
+#         claude -p "Review this BookTracker pull request diff for security issues, .NET issues, missing error handling, invented or outdated APIs or packages, and CLAUDE.md / .claude/rules/ violations. Short markdown bullet list with file references; say so if nothing material." \
 #           --model claude-sonnet-5-5 < pr.diff > review.md
 #
 #     - name: Post review comment
