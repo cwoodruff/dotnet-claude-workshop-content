@@ -127,9 +127,9 @@
 7. **Land it** (about 30 s):
 
    > "Skill = in-thread and steerable. Subagent = out-of-sight, hands back a summary. Background
-   > session = a whole session you check on later, and `/goal` keeps it on task. None of these is
-   > a place to put an instruction, so they aren't rows in the decision table; they change where
-   > the work runs. And notice what lets a background session run without stopping: Auto mode.
+   > session = a whole session you check on later, and `/goal` keeps it on task. Skills and
+   > subagents are rows in the decision table because they hold instructions. Background sessions
+   > and `/goal` aren't; they change where and how long the work runs. And notice what lets a background session run without stopping: Auto mode.
    > That's the next slide."
 
 8. **Clean up** after the section (not on stage): `claude stop <id>`, then `claude rm <id>` once
