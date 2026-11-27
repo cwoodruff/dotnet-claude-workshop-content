@@ -146,5 +146,5 @@ tools to BookTracker's real services.
 - **Cost is visible:** the loop sums `Usage` across iterations — three model calls for one user
   question. Multi-step capability isn't free; that's why you cap and log.
 - **Same pattern, real services:** BookTracker's production version of this demo lives in
-  `src/BookTracker/BookTracker.Api/Tools/BookTrackerTools.cs` and
-  `Services/AgentService.cs` — identical loop, wired to EF Core through Core interfaces.
+  `src/c6/BookTracker/BookTracker.Api/Tools/BookTrackerTools.cs` and
+  `Services/AgentService.cs` (content repo, the state after Day 2 Lab 2) — identical loop, wired to EF Core through Core interfaces.

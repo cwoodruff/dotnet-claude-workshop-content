@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- Same versions as src/BookTracker — keep them in sync. -->
+    <!-- Same versions as the BookTracker lab checkpoints (src/c7 onward in the content repo); keep them in sync. -->
     <PackageReference Include="Anthropic" Version="13.14.0" />
     <PackageReference Include="Microsoft.Extensions.AI" Version="10.7.0" />
     <PackageReference Include="OllamaSharp" Version="5.4.25" />

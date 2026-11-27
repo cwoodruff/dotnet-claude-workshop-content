@@ -1,0 +1,85 @@
+# AI code review on every pull request: the Day 1 code-review discipline, promoted into CI.
+# Copy to .github/workflows/ai-code-review.yml and merge it to main BEFORE opening the demo PR
+# (pull_request workflows run the file from the base branch).
+# Needs: the ANTHROPIC_API_KEY repo secret, and Actions allowed to write to pull requests.
+name: AI Code Review
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, ready_for_review]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  review:
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # The official action checks out the PR context, runs Claude Code, and posts the comment.
+      - name: Review the PR with Claude
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          # The workflow's own token, so no GitHub App install is needed for the comment.
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          # Sonnet 5.5 is the right tier for mechanical review work and keeps every PR cheap.
+          # --allowedTools pre-approves reading the PR and posting the comment. --permission-mode
+          # default makes any other tool call that would need approval fail instead of running,
+          # which matters because the PR content Claude reads is untrusted.
+          claude_args: |
+            --model claude-sonnet-5-5
+            --max-turns 10
+            --permission-mode default
+            --allowedTools "Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr comment:*)"
+          prompt: |
+            Review pull request #${{ github.event.pull_request.number }} in ${{ github.repository }}
+            (the BookTracker .NET solution). Look only at the changed lines and their immediate context.
+
+            Report, as a short markdown bullet list with file references:
+            - Security: SQL built from strings or interpolation, missing input validation,
+              missing auth, leaked secrets or connection strings.
+            - .NET issues: blocking calls (.Result/.Wait()), dropped CancellationToken,
+              EF entities returned from endpoints, wrong status codes.
+            - Missing error handling: swallowed exceptions, absent not-found/bad-request paths.
+            - Violations of CLAUDE.md and .claude/rules/ (DTOs not entities, thin async endpoints,
+              parameterized queries only, migrations in BookTracker.Data).
+
+            Only real, high-signal findings. If you find nothing material, say so.
+            Read the change with
+            `gh pr diff ${{ github.event.pull_request.number }} --repo ${{ github.repository }}`,
+            then post the result as a single comment with
+            `gh pr comment ${{ github.event.pull_request.number }} --repo ${{ github.repository }} --body "<your review>"`.
+
+# ---------------------------------------------------------------------------------------------
+# Alternative: own the plumbing with Claude Code headless (print mode) and the gh CLI.
+# Replace the "Review the PR with Claude" step above with these three steps.
+#
+#     - name: Install Claude Code (native installer, no Node needed)
+#       run: |
+#         curl -fsSL https://claude.ai/install.sh | bash
+#         echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+#
+#     - name: Review the diff
+#       env:
+#         ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+#       run: |
+#         set -euo pipefail
+#         git diff "origin/${{ github.base_ref }}...HEAD" > pr.diff
+#         claude -p "Review this BookTracker pull request diff for security issues, .NET issues, missing error handling, and CLAUDE.md / .claude/rules/ violations. Short markdown bullet list with file references; say so if nothing material." \
+#           --model claude-sonnet-5-5 < pr.diff > review.md
+#
+#     - name: Post review comment
+#       env:
+#         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#       run: gh pr comment "${{ github.event.pull_request.number }}" --body-file review.md
+#
+# `set -euo pipefail` makes a failed review fail the job instead of posting an empty comment.

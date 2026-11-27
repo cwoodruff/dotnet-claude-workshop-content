@@ -16,13 +16,13 @@
 - The **"adversarial test engineer"** re-prompt reliably surfaces edge cases the first pass missed — iteration cap, unknown tool names, empty tool results, missing `CancellationToken` propagation.
 - The loop ends the same way all testing ends: `dotnet test` to green.
 
-This demo runs Claude Code against the existing `src/BookTracker` solution — there is no separate demo project. (The demo plan references checkpoint folders like `src/c8/BookTracker`; this repo ships a single `src/BookTracker`, so run everything from there.)
+This demo runs Claude Code against the `src/c9/BookTracker` checkpoint in the workshop content repo, the state after Lab 5 Part A, which ships the reference tests you'll stash below. There is no separate demo project.
 
 The class under test is `BookTracker.Api/Services/AgentService.cs` — the provider-neutral tool-calling loop. Its seams are `IAgentLlm` / `IAgentConversation` (the LLM) and `BookTrackerTools` (tool dispatch), which is exactly what makes it unit-testable without the SDK.
 
 ## Prerequisites / setup
 
-- [ ] `cd "src/BookTracker"` and confirm a clean baseline: `dotnet build BookTracker.sln` succeeds.
+- [ ] `cd "src/c9/BookTracker"` and confirm a clean baseline: `dotnet build BookTracker.sln` succeeds.
 - [ ] Claude Code authenticated: `claude "say hi"` responds.
 - [ ] **Stage the generation honestly.** The reference solution already ships `BookTracker.Tests/Agent/AgentServiceTests.cs` and `AgentEdgeCaseTests.cs`. For a genuine live generation, temporarily move them out of the project (keep `AgentTestHarness.cs` — it's the pattern you want Claude to find and reuse):
 
@@ -45,7 +45,7 @@ The class under test is `BookTracker.Api/Services/AgentService.cs` — the provi
 3. **Start Claude Code from the solution folder.**
 
    ```bash
-   cd "src/BookTracker"
+   cd "src/c9/BookTracker"
    claude
    ```
 

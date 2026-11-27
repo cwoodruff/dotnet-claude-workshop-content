@@ -26,7 +26,7 @@
 The runnable solution is in [`src/`](src/) — a single self-contained Minimal API project
 (`Demo5.Rag`, net10.0) with an embedded 18-book catalog (`src/Demo5.Rag/Data/books.json`), so it
 needs no database and no BookTracker checkpoint. It mirrors the code attendees build in Lab 3
-against `src/BookTracker` (same `IVectorStore` / `EmbeddingService` / `TextChunker` shapes, same
+in `src/c7/BookTracker` (same `IVectorStore` / `EmbeddingService` / `TextChunker` shapes, same
 package versions: `Anthropic` 13.14.0, `Qdrant.Client` 1.18.1, `OllamaSharp` 5.4.25,
 `Microsoft.Extensions.AI` 10.7.0).
 

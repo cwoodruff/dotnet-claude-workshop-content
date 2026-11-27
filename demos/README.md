@@ -46,7 +46,7 @@ staged bug + failing output for the debugging demo.
 | `04-tool-calling-agent-loop` | Demo 4: Tool-calling agent loop (2+ tools) | Day2-Section2-Streaming-Tools-Thinking.pptx | [#19](https://github.com/cwoodruff/dotnet-claude-workshop/issues/19) | `src/` console app |
 | `05-rag-grounded-vs-ungrounded` | Demo 5: RAG — grounded vs ungrounded | Day2-Section3-RAG-Pipelines.pptx | [#20](https://github.com/cwoodruff/dotnet-claude-workshop/issues/20) | `src/` Minimal API + Qdrant/in-memory |
 | `06-csharp-mcp-server` | Demo 6: C# MCP server → Claude Code | Day2-Section4-MCP-Servers-CSharp.pptx | [#21](https://github.com/cwoodruff/dotnet-claude-workshop/issues/21) | `src/` MCP server (port 5100) |
-| `07-generate-xunit-suite` | Demo 7: Generate xUnit suite for AgentService | Day2-Section5-AI-Testing-CICD.pptx | [#22](https://github.com/cwoodruff/dotnet-claude-workshop/issues/22) | runs against `src/BookTracker` |
+| `07-generate-xunit-suite` | Demo 7: Generate xUnit suite for AgentService | Day2-Section5-AI-Testing-CICD.pptx | [#22](https://github.com/cwoodruff/dotnet-claude-workshop/issues/22) | runs against `src/c9/BookTracker` |
 | `08-github-actions-ai-review` | Demo 8: GitHub Actions AI review on a PR | Day2-Section5-AI-Testing-CICD.pptx | [#23](https://github.com/cwoodruff/dotnet-claude-workshop/issues/23) | `artifacts/ai-code-review.yml` |
 | `09-prompt-injection` | Demo 9: Prompt injection (make it visceral) | Day2-Section6-Responsible-AI-WrapUp.pptx | [#24](https://github.com/cwoodruff/dotnet-claude-workshop/issues/24) | `src/` Minimal API (port 5099) |
 
