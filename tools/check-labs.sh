@@ -10,9 +10,9 @@
 set -uo pipefail
 
 show_diff=false
-[ "${1:-}" = "--diff" ] && show_diff=true
+[[ "${1:-}" = "--diff" ]] && show_diff=true
 
-if [ ! -d src/c0/BookTracker ]; then
+if [[ ! -d src/c0/BookTracker ]]; then
   echo "Run this from the content repo root (src/c0/BookTracker not found)." >&2
   exit 1
 fi
@@ -29,16 +29,16 @@ for n in $(seq 0 10); do
   warnings=${warnings:-?}
 
   tests="not run"
-  if [ $build_status -eq 0 ]; then
+  if [[ $build_status -eq 0 ]]; then
     test_out=$(dotnet test "$dir/BookTracker.sln" --nologo --no-build 2>&1)
     test_status=$?
     tests=$(printf '%s\n' "$test_out" | grep -E 'Passed!|Failed!' | sed -E 's/^(Passed|Failed)! +- //; s/, Duration.*//' | head -1)
-    [ $test_status -ne 0 ] && failed=1
+    [[ $test_status -ne 0 ]] && failed=1
   fi
 
-  [ $build_status -ne 0 ] && failed=1
-  [ "$warnings" != "0" ] && failed=1
-  printf '%-5s %-8s %-9s %s\n' "c$n" "$([ $build_status -eq 0 ] && echo ok || echo FAILED)" "$warnings" "$tests"
+  [[ $build_status -ne 0 ]] && failed=1
+  [[ "$warnings" != "0" ]] && failed=1
+  printf '%-5s %-8s %-9s %s\n' "c$n" "$([[ $build_status -eq 0 ]] && echo ok || echo FAILED)" "$warnings" "$tests"
 done
 
 if $show_diff; then
