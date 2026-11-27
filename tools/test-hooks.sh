@@ -17,6 +17,10 @@ cases=(
   "2|git reset --hard HEAD~1"
   "2|git clean -fd"
   "2|DROP DATABASE booktracker"
+  "2|rm -r -f bin"
+  "2|rm --recursive --force bin"
+  "2|git clean -n -f"
+  "0|rm notes.txt"
   '2|Remove-Item `\n  -Recurse `\n  -Force bin'
   '2|rm \\\n  -rf bin'
   "2|rd /s /q obj"

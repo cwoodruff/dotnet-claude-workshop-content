@@ -8,12 +8,12 @@ using System.Text.RegularExpressions;
 
 (string Pattern, string Reason)[] rules =
 [
-    (@"\brm\s+-[a-z]*(r[a-z]*f|f[a-z]*r)", "recursive force delete ('rm -rf')"),
+    (@"\brm\b(?=.*\s-(-recursive\b|[a-z]*r))(?=.*\s-(-force\b|[a-z]*f))", "recursive force delete ('rm -rf')"),
     (@"\bRemove-Item\b(?=.*\s-Recurse\b)(?=.*\s-Force\b)", "recursive force delete ('Remove-Item -Recurse -Force')"),
     (@"\b(del|erase|rd|rmdir)\b.*\s/s\b", "recursive delete ('del /s', 'rd /s')"),
     (@"\bgit\s+reset\s+--hard\b", "discarding commits and changes ('git reset --hard')"),
     (@"\bgit\s+push\b.*(--force|\s-f\b)", "force push ('git push --force')"),
-    (@"\bgit\s+clean\s+-[a-z]*f", "deleting untracked files ('git clean -f')"),
+    (@"\bgit\s+clean\b(?=.*\s-([a-z]*f|-force\b))", "deleting untracked files ('git clean -f')"),
     (@"\bdrop\s+(table|database)\b", "dropping a table or database"),
 ];
 
@@ -30,7 +30,9 @@ try
 }
 catch (JsonException)
 {
-    return 0; // Not a tool call we understand: let Claude Code decide.
+    // Fail closed: a guardrail that can't read the command doesn't let it through.
+    await Console.Error.WriteLineAsync("Blocked by guardrail: could not read the tool call.");
+    return 2;
 }
 
 // Join continued lines (PowerShell backtick, bash backslash) so a command split
@@ -39,7 +41,17 @@ command = Regex.Replace(command, @"[`\\][ \t]*\r?\n", " ", RegexOptions.None, Ti
 
 foreach (var (pattern, reason) in rules)
 {
-    if (Regex.IsMatch(command, pattern, RegexOptions.IgnoreCase, TimeSpan.FromSeconds(1)))
+    bool matched;
+    try
+    {
+        matched = Regex.IsMatch(command, pattern, RegexOptions.IgnoreCase, TimeSpan.FromSeconds(1));
+    }
+    catch (RegexMatchTimeoutException)
+    {
+        matched = true; // Fail closed on a pathological command.
+    }
+
+    if (matched)
     {
         await Console.Error.WriteLineAsync($"Blocked by guardrail: {reason} is not allowed. " +
             "Use a safer alternative (for example dotnet clean, or delete specific files).");
