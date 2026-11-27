@@ -1,8 +1,8 @@
 {
   "hooks": {
     "PreToolUse": [
-      { "matcher": "Bash", "hooks": [
-        { "type": "command", "command": ".claude/hooks/block-destructive.sh" }
+      { "matcher": "Bash|PowerShell", "hooks": [
+        { "type": "command", "command": "dotnet run .claude/hooks/block-destructive.cs" }
       ]}
     ],
     "PostToolUse": [

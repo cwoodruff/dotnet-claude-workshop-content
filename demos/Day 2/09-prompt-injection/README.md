@@ -32,7 +32,7 @@ and mirror `BookTracker.Api/Security/PromptSafety.cs` and Section 6 of the works
 ## Prerequisites / setup
 
 - [ ] .NET 10 SDK installed (`dotnet --version` ≥ 10).
-- [ ] Anthropic API key with trial credit, set in user-secrets (never committed). From
+- [ ] Anthropic API key with credit (plan credit or prepaid), set in user-secrets (never committed). From
       [`src/Demo9.PromptInjection`](src/Demo9.PromptInjection):
 
       ```bash
