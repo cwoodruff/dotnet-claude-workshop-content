@@ -30,6 +30,10 @@ cases=(
   "0|Remove-Item bin"
   "0|git status"
   "2|<not json>"
+  # Valid JSON without a command string: no crash, nothing to check, so allowed.
+  # (Failing closed here would block every call if a tool names the field differently.)
+  "0|<array>"
+  "0|<string tool_input>"
 )
 
 fail=0
@@ -45,6 +49,8 @@ while IFS= read -r hook; do
     want="${c%%|*}"; cmd="${c#*|}"
     json=$(printf '{"tool_input":{"command":"%s"}}' "$cmd")
     [[ "$cmd" == "<not json>" ]] && json="not json"
+    [[ "$cmd" == "<array>" ]] && json="[]"
+    [[ "$cmd" == "<string tool_input>" ]] && json='{"tool_input":"x"}'
     got=$(cd "$root" && printf '%s' "$json" \
       | dotnet run .claude/hooks/block-destructive.cs >/dev/null 2>&1; echo $?)
     if [[ "$got" == "$want" ]]; then echo "  ok    exit=$got  $cmd"

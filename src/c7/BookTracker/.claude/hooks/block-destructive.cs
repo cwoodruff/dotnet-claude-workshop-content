@@ -16,47 +16,41 @@ using System.Text.RegularExpressions;
     (@"\bgit\s+clean\b(?=.*\s-([a-z]*f|-force\b))", "deleting untracked files ('git clean -f')"),
     (@"\bdrop\s+(table|database)\b", "dropping a table or database"),
 ];
+var timeout = TimeSpan.FromSeconds(1);
 
-var command = "";
 try
 {
     using var doc = JsonDocument.Parse(await Console.In.ReadToEndAsync());
-    if (doc.RootElement.TryGetProperty("tool_input", out var toolInput) &&
+    var root = doc.RootElement;
+    var command = "";
+    if (root.ValueKind == JsonValueKind.Object &&
+        root.TryGetProperty("tool_input", out var toolInput) &&
+        toolInput.ValueKind == JsonValueKind.Object &&
         toolInput.TryGetProperty("command", out var value) &&
         value.ValueKind == JsonValueKind.String)
     {
         command = value.GetString() ?? "";
     }
+
+    // Join continued lines (PowerShell backtick, bash backslash) so a command split
+    // across lines is checked as one line.
+    command = Regex.Replace(command, @"[`\\][ \t]*\r?\n", " ", RegexOptions.None, timeout);
+
+    foreach (var (pattern, reason) in rules)
+    {
+        if (Regex.IsMatch(command, pattern, RegexOptions.IgnoreCase, timeout))
+        {
+            await Console.Error.WriteLineAsync($"Blocked by guardrail: {reason} is not allowed. " +
+                "Use a safer alternative (for example dotnet clean, or delete specific files).");
+            return 2;
+        }
+    }
+
+    return 0;
 }
-catch (JsonException)
+catch (Exception ex)
 {
-    // Fail closed: a guardrail that can't read the command doesn't let it through.
-    await Console.Error.WriteLineAsync("Blocked by guardrail: could not read the tool call.");
+    // Fail closed: if the guardrail can't check the command, it doesn't let it through.
+    await Console.Error.WriteLineAsync($"Blocked by guardrail: could not check the command ({ex.GetType().Name}).");
     return 2;
 }
-
-// Join continued lines (PowerShell backtick, bash backslash) so a command split
-// across lines is checked as one line.
-command = Regex.Replace(command, @"[`\\][ \t]*\r?\n", " ", RegexOptions.None, TimeSpan.FromSeconds(1));
-
-foreach (var (pattern, reason) in rules)
-{
-    bool matched;
-    try
-    {
-        matched = Regex.IsMatch(command, pattern, RegexOptions.IgnoreCase, TimeSpan.FromSeconds(1));
-    }
-    catch (RegexMatchTimeoutException)
-    {
-        matched = true; // Fail closed on a pathological command.
-    }
-
-    if (matched)
-    {
-        await Console.Error.WriteLineAsync($"Blocked by guardrail: {reason} is not allowed. " +
-            "Use a safer alternative (for example dotnet clean, or delete specific files).");
-        return 2;
-    }
-}
-
-return 0;
