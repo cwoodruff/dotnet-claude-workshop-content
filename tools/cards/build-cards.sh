@@ -5,7 +5,11 @@
 set -euo pipefail
 here="$(cd "$(dirname "$0")" && pwd)"
 root="$(cd "$here/../.." && pwd)"
-build() { weasyprint "$here/$1.html" "$root/decks/$2/$1.pdf"; echo "built decks/$2/$1.pdf"; }
+build() {
+  local name="$1" day="$2"
+  weasyprint "$here/$name.html" "$root/decks/$day/$name.pdf"
+  echo "built decks/$day/$name.pdf"
+}
 build steering-reference-card "Day 1"
 build models-cost-reference-card "Day 2"
 build day2-faq-reference-card "Day 2"

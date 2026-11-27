@@ -20,7 +20,7 @@ using System.Text.RegularExpressions;
 var command = "";
 try
 {
-    using var doc = JsonDocument.Parse(Console.In.ReadToEnd());
+    using var doc = JsonDocument.Parse(await Console.In.ReadToEndAsync());
     if (doc.RootElement.TryGetProperty("tool_input", out var toolInput) &&
         toolInput.TryGetProperty("command", out var value) &&
         value.ValueKind == JsonValueKind.String)
@@ -35,9 +35,9 @@ catch (JsonException)
 
 foreach (var (pattern, reason) in rules)
 {
-    if (Regex.IsMatch(command, pattern, RegexOptions.IgnoreCase))
+    if (Regex.IsMatch(command, pattern, RegexOptions.IgnoreCase, TimeSpan.FromSeconds(1)))
     {
-        Console.Error.WriteLine($"Blocked by guardrail: {reason} is not allowed. " +
+        await Console.Error.WriteLineAsync($"Blocked by guardrail: {reason} is not allowed. " +
             "Use a safer alternative (for example dotnet clean, or delete specific files).");
         return 2;
     }

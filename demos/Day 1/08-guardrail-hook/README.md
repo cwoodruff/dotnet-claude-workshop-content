@@ -68,7 +68,7 @@
    rule (`rm -rf`, with its PowerShell twin right below it) and the two-line payoff:
 
    ```csharp
-   Console.Error.WriteLine($"Blocked by guardrail: {reason} is not allowed. ...");
+   await Console.Error.WriteLineAsync($"Blocked by guardrail: {reason} is not allowed. ...");
    return 2;
    ```
 

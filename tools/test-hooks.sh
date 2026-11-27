@@ -28,8 +28,8 @@ cases=(
 fail=0
 first=""
 while IFS= read -r hook; do
-  [ -z "$hook" ] && continue
-  if [ -z "$first" ]; then first="$hook"
+  [[ -z "$hook" ]] && continue
+  if [[ -z "$first" ]]; then first="$hook"
   elif ! cmp -s "$first" "$hook"; then echo "DIFF  $hook differs from $first"; fail=1
   fi
   root="${hook%/.claude/hooks/block-destructive.cs}"
@@ -38,11 +38,11 @@ while IFS= read -r hook; do
     want="${c%%|*}"; cmd="${c#*|}"
     got=$(cd "$root" && printf '{"tool_input":{"command":"%s"}}' "$cmd" \
       | dotnet run .claude/hooks/block-destructive.cs >/dev/null 2>&1; echo $?)
-    if [ "$got" = "$want" ]; then echo "  ok    exit=$got  $cmd"
+    if [[ "$got" == "$want" ]]; then echo "  ok    exit=$got  $cmd"
     else echo "  FAIL  exit=$got want=$want  $cmd"; fail=1
     fi
   done
 done < <(git ls-files '*block-destructive.cs')
 
-[ -n "$first" ] || { echo "No block-destructive.cs files are tracked."; exit 1; }
+[[ -n "$first" ]] || { echo "No block-destructive.cs files are tracked."; exit 1; }
 exit $fail

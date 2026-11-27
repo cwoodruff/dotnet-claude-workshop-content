@@ -20,7 +20,7 @@ jobs:
       - name: Install Claude Code
         # Native installer, pinned so a new release the week of the workshop can't change CI.
         run: |
-          curl -fsSL https://claude.ai/install.sh | bash -s 2.1.332
+          curl --proto '=https' --tlsv1.2 -fsSL https://claude.ai/install.sh | bash -s 2.1.332
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
       - name: Collect commits since previous tag
