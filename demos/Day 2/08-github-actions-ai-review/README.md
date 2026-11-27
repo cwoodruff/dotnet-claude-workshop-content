@@ -11,7 +11,7 @@
 
 ## What this demo teaches
 
-- The **review skill, now in CI**: the same code review attendees ran locally with `/code-review` on Day 1 becomes an automated PR gate — the Day 1 steering touchpoint made concrete.
+- The **review skill, now in CI**: the six .NET failure-mode checks attendees ran locally with `/dotnet-review` on Day 1 (beside the built-in `/code-review`) become an automated PR gate — the Day 1 steering touchpoint made concrete.
 - The cleanest path is the **official `anthropics/claude-code-action`** — it handles checkout, diff, and PR plumbing and posts the comment for you. The DIY alternative is Claude Code **headless** (`claude -p`, print mode) over the diff plus `gh pr comment`.
 - **Cost tiering in CI**: `--model claude-sonnet-5-5` is the right tier for mechanical review work and keeps every PR review cheap.
 - What the review hunts for: security issues, .NET issues, missing error handling, and **CLAUDE.md / `.claude/rules/` violations** — your project conventions become enforceable review criteria.
@@ -34,7 +34,7 @@ Everything here is on `artifacts/demo-pr-checklist.md` in more detail — the sh
 
 ## Step-by-step script
 
-1. **Frame it (45 s).** "Yesterday you ran `/code-review` by hand. That review is a *skill* — a playbook. Playbooks that live in one developer's terminal don't scale; playbooks in CI review every PR whether or not anyone remembers. Same discipline, promoted into the pipeline."
+1. **Frame it (45 s).** "Yesterday you ran `/dotnet-review` by hand, then the built-in `/code-review` to compare. That review is a *skill* — a playbook. Playbooks that live in one developer's terminal don't scale; playbooks in CI review every PR whether or not anyone remembers. Same discipline, promoted into the pipeline."
 
 2. **Show the workflow file (90 s).** Open `.github/workflows/ai-code-review.yml` in the demo repo (same content as `artifacts/ai-code-review.yml`). Walk top to bottom:
    - `on: pull_request` — every PR against `main` gets reviewed.
@@ -57,7 +57,7 @@ Everything here is on `artifacts/demo-pr-checklist.md` in more detail — the sh
 
    **Expected output:** an AI review comment on the PR — a short markdown bullet list of findings with file references. With the staged bait, it should flag the SQL interpolation / missing validation you planted. Read the best finding aloud: "It caught the injection. Nobody on your team had to remember to look."
 
-6. **Land it (45 s).** "Two things to take away. One: this is the *same* review skill from Day 1 — local `/code-review` and this workflow share the rubric. Two: Sonnet 5.5 makes it cheap enough to run on literally every PR. Lab 5 Part C: you wire this into your own fork in about eight minutes — the YAML is provided."
+6. **Land it (45 s).** "Two things to take away. One: this is the *same* review skill from Day 1 — local `/dotnet-review` and this workflow share the six-point rubric. Two: Sonnet 5.5 makes it cheap enough to run on literally every PR. Lab 5 Part C: you wire this into your own fork in about eight minutes — the YAML is provided."
 
 7. **Hand off to Lab 5.** Mention Part D uses the identical headless pattern for release notes on tag push — commits in, grouped notes out, Sonnet 5.5 again.
 
@@ -72,7 +72,7 @@ Everything here is on `artifacts/demo-pr-checklist.md` in more detail — the sh
 
 ## Teaching callouts
 
-- "This is the Day 1 steering touchpoint paying off: the CI review *is* a code-quality skill — the same `/code-review` you run locally, now triggered on every PR."
+- "This is the Day 1 steering touchpoint paying off: the CI review *is* a code-quality skill — the same checks as `/dotnet-review`, now triggered on every PR."
 - "The official action handles the plumbing — checkout, diff, comment. You bring the key and the rubric."
 - "Sonnet 5.5 keeps CI cheap — the right model tier for mechanical review work."
 - "CLAUDE.md violations are a review category. Your conventions doc is now enforced, not aspirational."

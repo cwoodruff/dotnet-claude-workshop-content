@@ -19,7 +19,7 @@ Each demo is tracked as a GitHub issue under its day's milestone:
 | `04-steering-decision` | Demo D-STEER: The Steering Decision | Section2-Steering-Claude-Code.pptx | [#6](https://github.com/cwoodruff/dotnet-claude-workshop/issues/6) |
 | `05-skill-folder-trigger` | Demo D4: Skill Folder + `/name` trigger | Section2-Steering-Claude-Code.pptx | [#7](https://github.com/cwoodruff/dotnet-claude-workshop/issues/7) |
 | `06-rules-path-scoped` | Demo D4b: Rules — path-scoped in C# | Section2-Steering-Claude-Code.pptx | [#8](https://github.com/cwoodruff/dotnet-claude-workshop/issues/8) |
-| `07-subagent-async` | Demo D5: Subagent (markdown) + Async | Section2-Steering-Claude-Code.pptx | [#9](https://github.com/cwoodruff/dotnet-claude-workshop/issues/9) |
+| `07-subagent-agent-view` | Demo D5: Subagent (markdown) + Agent View | Section2-Steering-Claude-Code.pptx | [#9](https://github.com/cwoodruff/dotnet-claude-workshop/issues/9) |
 | `08-guardrail-hook` | Demo D6: Guardrail Hook (PreToolUse exit 2) | Section2-Steering-Claude-Code.pptx | [#10](https://github.com/cwoodruff/dotnet-claude-workshop/issues/10) |
 | `09-package-as-plugin` | Demo D6b: Package as Plugin | Section2-Steering-Claude-Code.pptx | [#11](https://github.com/cwoodruff/dotnet-claude-workshop/issues/11) |
 | `10-github-mcp-server` | Demo 8: GitHub MCP Server | Section3-IDE-Integration-MCP.pptx | [#12](https://github.com/cwoodruff/dotnet-claude-workshop/issues/12) |
