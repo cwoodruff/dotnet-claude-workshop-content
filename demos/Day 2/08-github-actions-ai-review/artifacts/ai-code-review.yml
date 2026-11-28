@@ -65,10 +65,8 @@ jobs:
 # Alternative: own the plumbing with Claude Code headless (print mode) and the gh CLI.
 # Replace the "Review the PR with Claude" step above with these three steps.
 #
-#     - name: Install Claude Code (native installer, pinned, no Node needed)
-#       run: |
-#         curl --proto '=https' --tlsv1.2 -fsSL https://claude.ai/install.sh | bash -s 2.1.332
-#         echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+#     - name: Install Claude Code (npm, pinned; npm checks the integrity hash)
+#       run: npm install -g @anthropic-ai/claude-code@2.1.332
 #
 #     - name: Review the diff
 #       env:
