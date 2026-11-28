@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **Slide deck** | `decks/Day 2/Day2-Section4-MCP-Servers-CSharp.pptx` (slide 9, "Live Demo") |
-| **Scheduled** | 2:55 PM (Section 4, Block 4B → 4C) |
+| **Scheduled** | 2:48 PM (Section 4, Block 4B → 4C) |
 | **Duration** | ~12 min |
 | **Risk** | **High** (live server + live Claude Code connect — record a backup run) |
 | **Requires** | Local .NET 10 SDK, Claude Code installed and authenticated |

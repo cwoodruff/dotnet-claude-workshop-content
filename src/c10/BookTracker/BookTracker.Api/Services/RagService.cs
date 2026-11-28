@@ -59,6 +59,7 @@ public class RagService : IRagService
         {
             Model = _anthropic.Model,
             MaxTokens = _anthropic.MaxTokens,
+            OutputConfig = _anthropic.ToOutputConfig(),
             System = new List<TextBlockParam>
             {
                 new() { Text = context.ToString(), CacheControl = new CacheControlEphemeral() },

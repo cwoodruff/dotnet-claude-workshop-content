@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **Slide deck** | `decks/Day 2/Day2-Section5-AI-Testing-CICD.pptx` (slide 9, "Live Demo," part 2) |
-| **Scheduled** | 4:00 PM |
+| **Scheduled** | 3:53 PM |
 | **Duration** | ~8 min |
 | **Risk** | **HIGH** (live GitHub Actions + live Anthropic API — have the recorded backup ready) |
 | **Requirements** | Internet; a GitHub repo with Actions enabled; `ANTHROPIC_API_KEY` repo secret; a staged demo PR; `gh` CLI authenticated |

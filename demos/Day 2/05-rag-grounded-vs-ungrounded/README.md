@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **Slide deck** | `decks/Day 2/Day2-Section3-RAG-Pipelines.pptx` (slide 11, "Live Demo") |
-| **Scheduled** | 1:50 PM (Section 3 · RAG Pipelines in .NET) |
+| **Scheduled** | 1:43 PM (Section 3 · RAG Pipelines in .NET) |
 | **Duration** | ~10 min |
 | **Risk** | Medium (Docker + Ollama + live API call) |
 | **Internet** | Docker + API (Anthropic API for the answers; Qdrant and Ollama run locally) |

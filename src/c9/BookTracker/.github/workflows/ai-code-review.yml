@@ -18,10 +18,12 @@ jobs:
           fetch-depth: 0
 
       - name: Install Claude Code
-        # Native installer, pinned so a new release the week of the workshop can't change CI.
+        # npm checks the package against its published integrity hash. Pinned so a new release
+        # the week of the workshop can't change CI. Node is preinstalled on ubuntu-latest.
+        # Lifecycle scripts are off; install.cjs only links the native binary npm just verified.
         run: |
-          curl --proto '=https' --tlsv1.2 -fsSL https://claude.ai/install.sh | bash -s 2.1.332
-          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          npm install -g --ignore-scripts @anthropic-ai/claude-code@2.1.332
+          node "$(npm root -g)/@anthropic-ai/claude-code/install.cjs"
 
       - name: Build the diff
         run: git diff origin/${{ github.base_ref }}...HEAD > pr.diff

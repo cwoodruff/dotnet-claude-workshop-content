@@ -40,5 +40,5 @@ matching files): `api-endpoints.md`, `data-access.md`.
 
 ## Notes
 
-- The starter has intentional gaps (missing validation, an entity-returning endpoint, etc.) — they're
+- The starter has intentional gaps (missing validation, a string-built SQL search, etc.) — they're
   there to find and fix, not to copy.

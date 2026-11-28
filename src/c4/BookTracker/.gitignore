@@ -1,0 +1,11 @@
+## Build output
+bin/
+obj/
+
+## Local SQLite database
+*.db
+*.db-shm
+*.db-wal
+
+## macOS
+.DS_Store

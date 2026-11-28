@@ -14,7 +14,7 @@ public class QdrantRagTests
     [DockerFact]
     public async Task UpsertThenSearch_ReturnsNearestNeighbour()
     {
-        await using var container = new QdrantBuilder().Build();
+        await using var container = new QdrantBuilder("qdrant/qdrant:v1.12.4").Build();
         await container.StartAsync();
 
         var options = Options.Create(new VectorStoreOptions

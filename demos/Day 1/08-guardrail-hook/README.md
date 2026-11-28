@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **Slide deck** | `decks/Day 1/Section2-Steering-Claude-Code.pptx` |
-| **Scheduled** | 12:08 PM (Section 2, Block 2C — after the hooks slides) |
+| **Scheduled** | 12:00 PM (Section 2, Block 2C — after the permission ladder and hooks slides) |
 | **Duration** | 8 min |
 | **Risk** | Low |
 | **Internet** | Yes, for Claude Code's model connection (nothing else) |

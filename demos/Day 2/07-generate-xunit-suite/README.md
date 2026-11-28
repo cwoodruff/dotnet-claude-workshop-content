@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **Slide deck** | `decks/Day 2/Day2-Section5-AI-Testing-CICD.pptx` (slide 9, "Live Demo," part 1) |
-| **Scheduled** | 3:42 PM |
+| **Scheduled** | 3:35 PM |
 | **Duration** | ~8 min |
 | **Risk** | Low |
 | **Requirements** | Claude Code installed and authenticated; the BookTracker solution builds; no API key needed beyond your Claude Code auth |

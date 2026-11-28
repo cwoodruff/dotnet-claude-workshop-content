@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **Slide deck** | `decks/Day 1/Section2-Steering-Claude-Code.pptx` |
-| **Scheduled** | 11:38 AM (Section 2, Block 2B — after the skills demo D4) |
+| **Scheduled** | 11:16 AM (Section 2, Block 2B — after the skills demo D4) |
 | **Duration** | 7 min |
 | **Risk** | Low |
 | **Internet** | Yes, for Claude Code's model connection (nothing else) |

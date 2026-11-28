@@ -16,9 +16,12 @@ Everything is taught against **BookTracker**, a realistic ASP.NET Core Minimal A
 ## What's in this repository
 
 ```
-decks/   Slide decks for Day 1 and Day 2 (PowerPoint)
-src/     Eleven frozen checkpoints of the BookTracker app: c0 … c10
-docs/    Support reference pdf documents for the workshop
+decks/                    Slide decks for Day 1 and Day 2 (PowerPoint), plus the three reference-card PDFs
+demos/                    The instructor demo scripts and the Day 2 demo projects
+src/                      Eleven checkpoints of the BookTracker app: c0 … c10
+specs/                    Feature specs used in the labs
+dotnet-claude-code-kit/   Pointer to the .NET kit plugin (installed with one command)
+tools/                    Scripts, including tools/check-labs.sh to build and test every checkpoint
 ```
 
 ### Checkpoints: c0 through c10
@@ -29,24 +32,26 @@ Each directory under `src/` (`c0`–`c10`) is a **complete, independently builda
 |---|---|---|
 | [`c0`](src/c0/BookTracker/README.md) | 1 | Starter app: Books + Authors API — with intentional teaching gaps you'll discover in the labs |
 | [`c1`](src/c1/BookTracker/README.md) | 1 | Project memory: a `CLAUDE.md` for the app |
-| [`c2`](src/c2/BookTracker/README.md) | 1 | `.claude/` customization (rules, agents, hooks, skills, plugin) + Reviews feature |
+| [`c2`](src/c2/BookTracker/README.md) | 1 | `.claude/` customization (rules, a subagent, a C# guardrail hook, a skill, a plugin manifest) + Reviews feature |
 | [`c3`](src/c3/BookTracker/README.md) | 1 | MCP integration (`.mcp.json` with GitHub MCP) + proposed issues |
 | [`c4`](src/c4/BookTracker/README.md) | 1 | Reading Progress feature built from a written spec (`specs/reading-progress.md`) |
 | [`c5`](src/c5/BookTracker/README.md) | 2 | Anthropic C# SDK, `/api/chat` endpoint, `ClaudeService` |
 | [`c6`](src/c6/BookTracker/README.md) | 2 | Streaming responses, tool use, and an agent loop (`AgentService`) |
 | [`c7`](src/c7/BookTracker/README.md) | 2 | RAG: vector store project, `/api/recommend`, Qdrant via Docker Compose |
 | [`c8`](src/c8/BookTracker/README.md) | 2 | `BookTracker.Mcp` — an MCP server written in C# |
-| [`c9`](src/c9/BookTracker/README.md) | 2 | Testing AI systems: LLM abstraction, agent tests, integration tests with Testcontainers |
-| [`c10`](src/c10/BookTracker/README.md) | 2 | Responsible AI: prompt-injection defenses, AI audit logging, token-budget middleware, security tests |
+| [`c9`](src/c9/BookTracker/README.md) | 2 | Testing AI systems: LLM abstraction, agent tests, integration tests with Testcontainers, GitHub Actions AI review + release notes |
+| [`c10`](src/c10/BookTracker/README.md) | 2 | Responsible AI: prompt-injection defenses, AI audit logging, token-budget middleware, the effort setting, OpenTelemetry traces, security tests |
 
-⚠️ **Heads up:** the early checkpoints (`c0`–`c3`) contain *deliberate* problems — validation holes, a SQL-injection vector, endpoints returning EF entities. Finding and fixing them is part of the labs, so resist the urge to "clean them up" before the workshop. The fully hardened app is `c10`.
+⚠️ **Heads up:** the starter contains *deliberate* problems — validation holes and a SQL-injection vector among them. Finding and fixing them is part of the labs, so resist the urge to "clean them up" before the workshop. `c10` adds the responsible-AI hardening, but the string-built SQL search in `BookRepository.SearchByTitleAsync` is still there in every checkpoint: don't ship any of them as-is.
 
 ## Getting started
 
 ### Prerequisites
 
-- [.NET 10 SDK](https://dotnet.microsoft.com/download)
-- [Claude Code](https://claude.com/claude-code) (Day 1) and an Anthropic API key (Day 2)
+- [.NET 10 SDK](https://dotnet.microsoft.com/download) — also runs the workshop's C# hooks, so there's nothing else to install for them
+- [Claude Code](https://claude.com/claude-code) (Day 1), from the native installer — no Node.js needed:
+  `curl -fsSL https://claude.ai/install.sh | bash` on macOS and Linux, `irm https://claude.ai/install.ps1 | iex` in Windows PowerShell
+- An Anthropic API key (Day 2). The app uses Claude Opus 5.5; CI review uses Claude Sonnet 5.5.
 - [Docker](https://www.docker.com/) — for Qdrant (c7+) and Testcontainers-based tests (c9+)
 
 ### Running a checkpoint
@@ -66,6 +71,7 @@ The SQLite database is created, migrated, and seeded automatically at startup.
 For checkpoints `c5` and later, set your Anthropic API key with user secrets (never commit it):
 
 ```bash
+dotnet user-secrets init --project BookTracker.Api   # once per checkout; safe to rerun
 dotnet user-secrets set "Anthropic:ApiKey" "your-key-here" --project BookTracker.Api
 ```
 

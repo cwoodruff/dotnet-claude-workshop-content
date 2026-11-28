@@ -5,8 +5,8 @@ for tracking books, backed by EF Core 10 and SQLite.
 
 > **c10 — responsible AI & the finished app.** *Day 2 · Section 6 — Responsible AI & Wrap-Up.* This
 > is `c9` hardened for production: **prompt-injection defenses**, an **AI audit log**, a
-> **token-budget middleware**, and security tests. This is the **final checkpoint** — the fully
-> hardened BookTracker, with all the earlier intentional teaching gaps closed.
+> **token-budget middleware**, and security tests. This is the **final checkpoint**. One starter
+> gap is still open: `BookRepository.SearchByTitleAsync` builds its SQL from the search term.
 
 ## What's new in this checkpoint
 
@@ -28,8 +28,9 @@ for tracking books, backed by EF Core 10 and SQLite.
 ### AI audit logging
 
 - **`AiAuditLog`** entity (`BookTracker.Core/Entities/`) + **`IAiAuditService`** /
-  **`AiAuditService`** — persist a record of every AI interaction (who asked what, tokens, outcome)
-  for review and accountability.
+  **`AiAuditService`** — persist one row per completed chat, agent, or recommend request (who asked,
+  tokens, outcome) for review and accountability. An agent request is one row with its turns summed.
+  The SSE stream at `/api/chat/stream` is not audited and its tokens do not count toward the budget.
 - EF Core migration **`AddAiAuditLog`**.
 
 ### Security tests (`BookTracker.Tests/Security/`)
@@ -42,7 +43,7 @@ for tracking books, backed by EF Core 10 and SQLite.
 ## Prerequisites
 
 - **.NET 10 SDK** · **Anthropic API key**
-  (`dotnet user-secrets set "Anthropic:ApiKey" "your-key-here" --project BookTracker.Api`)
+  (`dotnet user-secrets init --project BookTracker.Api`, then `dotnet user-secrets set "Anthropic:ApiKey" "your-key-here" --project BookTracker.Api`)
 - **Docker / Ollama** only for the RAG path and the `c9` container tests.
 
 ## Getting started
@@ -77,7 +78,8 @@ BookTracker.Tests/Security/
 
 Same surface as `c9` (Books, Authors, Reviews, Reading Progress, Chat, Agent, Recommend) — but the AI
 endpoints are now wrapped in the safety, budget, and audit layers. Requests that exceed the token
-budget are rejected by the middleware; every AI call is written to the audit log.
+budget are rejected by the middleware; each completed chat, agent, or recommend request is
+written to the audit log. The SSE stream is the exception: it is budget-checked but not audited.
 
 ## The finished app
 

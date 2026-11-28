@@ -17,7 +17,7 @@ public class SqlServerTests
     [DockerFact("RUN_MSSQL_TESTS")]
     public async Task DataLayer_OnSqlServer_AppliesSchemaAndSeed()
     {
-        await using var container = new MsSqlBuilder().Build();
+        await using var container = new MsSqlBuilder("mcr.microsoft.com/mssql/server:2022-latest").Build();
         await container.StartAsync();
 
         var options = new DbContextOptionsBuilder<BookTrackerDbContext>()
