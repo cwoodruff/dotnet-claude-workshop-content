@@ -66,7 +66,9 @@ jobs:
 # Replace the "Review the PR with Claude" step above with these three steps.
 #
 #     - name: Install Claude Code (npm, pinned; npm checks the integrity hash)
-#       run: npm install -g @anthropic-ai/claude-code@2.1.332
+#       run: |
+#         npm install -g --ignore-scripts @anthropic-ai/claude-code@2.1.332
+#         node "$(npm root -g)/@anthropic-ai/claude-code/install.cjs"
 #
 #     - name: Review the diff
 #       env:

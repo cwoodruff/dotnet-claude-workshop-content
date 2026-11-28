@@ -20,7 +20,10 @@ jobs:
       - name: Install Claude Code
         # npm checks the package against its published integrity hash. Pinned so a new release
         # the week of the workshop can't change CI. Node is preinstalled on ubuntu-latest.
-        run: npm install -g @anthropic-ai/claude-code@2.1.332
+        # Lifecycle scripts are off; install.cjs only links the native binary npm just verified.
+        run: |
+          npm install -g --ignore-scripts @anthropic-ai/claude-code@2.1.332
+          node "$(npm root -g)/@anthropic-ai/claude-code/install.cjs"
 
       - name: Collect commits since previous tag
         env:
